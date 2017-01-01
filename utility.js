@@ -14,6 +14,12 @@ var Utility = {
         }
     },
     Evaluate: {
+        /*
+         * Returns true if func is undefined, or returns the return value of func by passing it value
+         */
+        ifDefinedIsItTrue: function(func, value) {
+            return (func) ? (func(value)) : (true);
+        },
         isCreepRole: function(creep, role) {
             return creep.memory.role === role;   
         },
@@ -50,7 +56,7 @@ var Utility = {
         }
     },
     Get: {
-        structureOfTypeAtRoomPosition: function(room, type, pos, ownership = 0, strictOwnership = false) {
+        structureOfTypeAtRoomPosition: function(room, type, pos, ownership = 0, strictOwnership = false, additionalFilter = undefined) {
             let found = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
             if (found.length > 0) {
                 for (let key in found) {
@@ -58,7 +64,9 @@ var Utility = {
 
                     if (structure.structureType === type) {
                         if (Utility.Evaluate.isStructureOwnedBy(structure, ownership, strictOwnership)) {
-                            return structure;
+                            if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                                return structure;
+                            }
                         }
                     }
                 }
@@ -68,28 +76,35 @@ var Utility = {
         }
     },
     List: {
-        allConstructionSitesInRoom: function(room, ownership = 0) {
+        allConstructionSitesInRoom: function(room, ownership = 0, additionalFilter = undefined) {
             let sites = room.find(FIND_CONSTRUCTION_SITES, {
                 filter: function(site) {
-                    if (ownership == Utility.OWNERSHIP_MINE) {
-                        return site.my;
-                    }
-                    else if (ownership == Utility.OWNERSHIP_ENEMY) {
-                        return !site.my;
+                    if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                        if (ownership == Utility.OWNERSHIP_MINE) {
+                            return site.my;
+                        }
+                        else if (ownership == Utility.OWNERSHIP_ENEMY) {
+                            return !site.my;
+                        }
+                        else {
+                            return true;
+                        }
                     }
                     else {
-                        return true;
+                        return false;
                     }
                 }
             });
             return sites;
         },
-        allStructuresOfTypeInRoom: function(room, type, ownership = 0, strictOwnership = false) {
+        allStructuresOfTypeInRoom: function(room, type, ownership = 0, strictOwnership = false, additionalFilter = undefined) {
             let structures = room.find(FIND_STRUCTURES, {
                 filter: function(structure) {
                     if (structure.structureType === type) {
                         if (Utility.Evaluate.isStructureOwnedBy(structure, ownership, strictOwnership)) {
-                            return true;
+                            if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                                return true;
+                            }
                         }
                     }
 
