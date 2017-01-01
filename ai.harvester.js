@@ -227,7 +227,8 @@ var AIHarvester = {
                                     }
                                     else {
                                        //Get all spawns owned by me that are not topped off
-                                       let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, true, function(structure) {
+                                       let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, false, function(structure) {
+                                          console.log(structure.name + " energy = " + structure.energy);
                                           return structure.energy < structure.energyCapacity;
                                        });
 
