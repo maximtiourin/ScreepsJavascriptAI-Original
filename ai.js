@@ -73,6 +73,18 @@ var AI = {
                   creep.moveTo(target);
                }
             }
+         },
+         Upgrade: {
+            /*
+             * Attempts to upgrade the target, moving to it if not in range
+             */
+            target: function(creep, target) {
+               let ret = creep.upgradeController(target);
+
+               if (ret == ERR_NOT_IN_RANGE) {
+                  creep.moveTo(target);
+               }
+            }
          }
       }
    }

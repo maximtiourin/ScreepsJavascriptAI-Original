@@ -121,6 +121,10 @@ var AIBuilder = {
                      //Attempt to repair priority structure
                      AI.Creep.Behavior.Repair.target(creep, priorityStructure);
                   }
+                  else {
+                     //Try to upgrade controller instead of idling
+                     
+                  }
                }
             }
          }
