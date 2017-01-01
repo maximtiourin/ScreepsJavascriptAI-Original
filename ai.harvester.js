@@ -168,7 +168,7 @@ var AIHarvester = {
                      }
 
 
-                      if (!creepMem.isHarvesting) {
+                     if (!creepMem.isHarvesting) {
                         //Energy is not empty, check to see if we need to work with the container
                         let state = t.determineSourceContainerState(creep);
                         creepMem.sourceContainerState = state; //Cache return state for optimization reuse in determineSourceContainerState
@@ -221,17 +221,42 @@ var AIHarvester = {
                                     }
                                  }
                                  else {
-                                    //Should idle at sourcePoint, or conversely, switch to harvesting if energy is not topped off
+                                    //If energy not topped off, go harvest, otherwise check if a spawn needs energy, otherwise idle at sourcePoint
                                     if (!t.isEnergyFull(creep)) {
                                        creepMem.isHarvesting = true;
                                     }
                                     else {
-                                       let point = creep.memory.checkedOutSource;
-                                       let pos = creep.pos;
+                                       //Get all spawns owned by me that are not topped off
+                                       let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, true, function(structure) {
+                                          return structure.energy < structure.energyCapacity;
+                                       });
 
-                                       //Check if we are on correct source point, move if necessary
-                                       if (!(point.x == pos.x && point.y == pos.y)) {
-                                          creep.moveTo(point.x, point.y);
+                                       if (spawns.length > 0) {
+                                          //Sort by distanceSquared
+                                          spawnsSorted = _.sortBy(spawns, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+
+                                          //Select closest spawn
+                                          let spawn = spawnsSorted[0];
+
+                                          //Attempt to refuel the spawn
+                                          let ret = creep.transfer(spawn, RESOURCE_ENERGY);
+
+                                          if (ret == ERR_NOT_IN_RANGE) {
+                                             creep.moveTo(spawn);
+                                          }
+                                          else if (ret != OK && ret != ERR_FULL) {
+                                             t.handleError("Harvester Transfer To Spawn", creep, ret);
+                                          }
+                                       }
+                                       else {
+                                          //Idle at sourcePoint
+                                          let point = creep.memory.checkedOutSource;
+                                          let pos = creep.pos;
+
+                                          //Check if we are on correct source point, move if necessary
+                                          if (!(point.x == pos.x && point.y == pos.y)) {
+                                             creep.moveTo(point.x, point.y);
+                                          }
                                        }
                                     }
                                  }
