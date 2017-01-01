@@ -15,9 +15,9 @@ var Utility = {
     },
     Evaluate: {
         /*
-         * Returns true if func is undefined, or returns the return value of func by passing it value
+         * Returns true if func is undefined, otherwise returns the result of "func(value)"
          */
-        ifFunctionIsDefinedAndTrue: function(func, value) {
+        undefinedBooleanFunction: function(func, value) {
             return (func) ? (func(value)) : (true);
         },
         isCreepRole: function(creep, role) {
@@ -64,7 +64,7 @@ var Utility = {
 
                     if (structure.structureType === type) {
                         if (Utility.Evaluate.isStructureOwnedBy(structure, ownership, strictOwnership)) {
-                            if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                            if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, structure)) {
                                 return structure;
                             }
                         }
@@ -79,7 +79,7 @@ var Utility = {
         allConstructionSitesInRoom: function(room, ownership = 0, additionalFilter = undefined) {
             let sites = room.find(FIND_CONSTRUCTION_SITES, {
                 filter: function(site) {
-                    if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                    if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, structure)) {
                         if (ownership == Utility.OWNERSHIP_MINE) {
                             return site.my;
                         }
@@ -102,7 +102,7 @@ var Utility = {
                 filter: function(structure) {
                     if (structure.structureType === type) {
                         if (Utility.Evaluate.isStructureOwnedBy(structure, ownership, strictOwnership)) {
-                            if (Utility.Evaluate.ifFunctionIsDefinedAndTrue(additionalFilter, structure)) {
+                            if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, structure)) {
                                 return true;
                             }
                         }
