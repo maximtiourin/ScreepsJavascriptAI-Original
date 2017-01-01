@@ -119,7 +119,7 @@ var AIBuilder = {
                      let priorityStructure = sortedStructures[sortedKey];
 
                      //Attempt to repair priority structure
-                     AI.Creep.Behavior.Repair(creep, priorityStructure);
+                     AI.Creep.Behavior.Repair.target(creep, priorityStructure);
                   }
                }
             }
