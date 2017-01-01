@@ -9,11 +9,14 @@ var AIBuilder = {
     * Applies a filter value to an object with the property 'structureType', allowing it to be sorted in ascending order of most priority (0) to least priority (999)
     */
    filterStructureTypes: function(e) {
-      if (e.structureType === STRUCTURE_CONTAINER) {
+      if (e.structureType === STRUCTURE_RAMPART) {
          return 0;
       }
-      else if (e.structureType === STRUCTURE_EXTENSION) {
+      else if (e.structureType === STRUCTURE_CONTAINER) {
          return 1;
+      }
+      else if (e.structureType === STRUCTURE_EXTENSION) {
+         return 2;
       }
       else {
          return 999;
@@ -123,7 +126,7 @@ var AIBuilder = {
                   }
                   else {
                      //Try to upgrade controller instead of idling
-                     
+                     AI.Creep.Behavior.Upgrade.target(creep, room.controller);
                   }
                }
             }
