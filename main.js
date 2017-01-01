@@ -1,4 +1,5 @@
 //Define global structure
+global.AI =                   global.AI                  || require('ai');
 global.AIBuilder =            global.AIBuilder           || require('ai.builder');
 global.AIHarvester =          global.AIHarvester         || require('ai.harvester');
 global.Factory =              global.Factory             || require('factory');

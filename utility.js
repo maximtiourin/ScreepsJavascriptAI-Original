@@ -18,7 +18,7 @@ var Utility = {
          * Returns true if func is undefined, otherwise returns the result of "func(value)"
          */
         undefinedBooleanFunction: function(func, value) {
-            return (func) ? (func(value)) : (true);
+            return (func != undefined && func != null) ? (func(value)) : (true);
         },
         isCreepRole: function(creep, role) {
             return creep.memory.role === role;   
@@ -32,7 +32,7 @@ var Utility = {
                 return true;
             }
             else if (ownership == Utility.OWNERSHIP_MINE) {
-                if (structure instanceof OwnedStructure) {
+                if (structure.owner) {
                     if (structure.my) {
                         return true;
                     }
@@ -42,7 +42,7 @@ var Utility = {
                 }
             }
             else if (ownership == Utility.OWNERSHIP_ENEMY) {
-                if (structure instanceof OwnedStructure) {
+                if (structure.owner) {
                     if (!structure.my) {
                         return true;
                     }
@@ -79,7 +79,7 @@ var Utility = {
         allConstructionSitesInRoom: function(room, ownership = 0, additionalFilter = undefined) {
             let sites = room.find(FIND_CONSTRUCTION_SITES, {
                 filter: function(site) {
-                    if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, structure)) {
+                    if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, site)) {
                         if (ownership == Utility.OWNERSHIP_MINE) {
                             return site.my;
                         }
@@ -91,7 +91,7 @@ var Utility = {
                         }
                     }
                     else {
-                        return false;
+                       return false;
                     }
                 }
             });

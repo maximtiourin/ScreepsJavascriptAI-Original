@@ -70,14 +70,7 @@ var AIBuilder = {
                   //Select closest container to refuel from
                   let closestContainer = sortedFilterContainers[0];
 
-                  let ret = creep.withdraw(closestContainer, RESOURCE_ENERGY);
-
-                  if (ret == ERR_NOT_IN_RANGE) {
-                     creep.moveTo(closestContainer);
-                  }
-                  else if (ret != OK && ret != ERR_NOT_ENOUGH_RESOURCES) {
-                     t.handleError("Builder Refuel at Container", creep, ret);
-                  }
+                  AI.Creep.Behavior.Refuel.fromTarget(creep, closestContainer, RESOURCE_ENERGY);
                }
             }
             else {
@@ -101,14 +94,7 @@ var AIBuilder = {
                   let prioritySite = sortedPriorities[sortedKey];
 
                   //Attempt to build our priority site
-                  let ret = creep.build(prioritySite);
-
-                  if (ret == ERR_NOT_IN_RANGE) {
-                     creep.moveTo(prioritySite);
-                  }
-                  else if (ret != OK) {
-                     t.handleError("Builder Build at Construction Site", creep, ret);
-                  }
+                  AI.Creep.Behavior.Build.target(creep, prioritySite);
                }
                else {
                   // {TODO} Look for something to repair

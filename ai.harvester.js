@@ -181,14 +181,7 @@ var AIHarvester = {
                            let site = Game.getObjectById(creepMem.sourceContainer);
 
                            if (site) {
-                              let ret = creep.build(site);
-
-                              if (ret == ERR_NOT_IN_RANGE) {
-                                 creep.moveTo(site);
-                              }
-                              else if (ret != OK) {
-                                 t.handleError("Harvester Build Container", creep, ret);
-                              }
+                              AI.Creep.Behavior.Build.target(creep, site);
                            }
                         }
                         else if (state == t.STATE_SOURCE_CONTAINER_BUILT) {
@@ -198,27 +191,13 @@ var AIHarvester = {
                            if (container) {
                               if (container.hits < container.hitsMax) {
                                  //Should repair
-                                 let ret = creep.repair(container);
-
-                                 if (ret == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(container);
-                                 }
-                                 else if (ret != OK) {
-                                    t.handleError("Harvester Repair Container", creep, ret);
-                                 }
+                                 AI.Creep.Behavior.Repair.target(creep, container);
                               }
                               else {
                                  //Check to see if container has room
                                  if (Utility.Count.containerResources(container) < container.storeCapacity) {
                                     //Should deposit
-                                    let ret = creep.transfer(container, RESOURCE_ENERGY);
-
-                                    if (ret == ERR_NOT_IN_RANGE) {
-                                       creep.moveTo(container);
-                                    }
-                                    else if (ret != OK && ret != ERR_FULL) {
-                                       t.handleError("Harvester Transfer To Container", creep, ret);
-                                    }
+                                    AI.Creep.Behavior.Refuel.target(creep, container, RESOURCE_ENERGY);
                                  }
                                  else {
                                     //If energy not topped off, go harvest, otherwise check if a spawn needs energy, otherwise idle at sourcePoint
@@ -227,8 +206,7 @@ var AIHarvester = {
                                     }
                                     else {
                                        //Get all spawns owned by me that are not topped off
-                                       let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, false, function(structure) {
-                                          console.log(structure.name + " energy = " + structure.energy);
+                                       let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, true, function(structure) {
                                           return structure.energy < structure.energyCapacity;
                                        });
 
@@ -240,24 +218,11 @@ var AIHarvester = {
                                           let spawn = spawnsSorted[0];
 
                                           //Attempt to refuel the spawn
-                                          let ret = creep.transfer(spawn, RESOURCE_ENERGY);
-
-                                          if (ret == ERR_NOT_IN_RANGE) {
-                                             creep.moveTo(spawn);
-                                          }
-                                          else if (ret != OK && ret != ERR_FULL) {
-                                             t.handleError("Harvester Transfer To Spawn", creep, ret);
-                                          }
+                                          AI.Creep.Behavior.Refuel.target(creep, spawn, RESOURCE_ENERGY);
                                        }
                                        else {
                                           //Idle at sourcePoint
-                                          let point = creep.memory.checkedOutSource;
-                                          let pos = creep.pos;
-
-                                          //Check if we are on correct source point, move if necessary
-                                          if (!(point.x == pos.x && point.y == pos.y)) {
-                                             creep.moveTo(point.x, point.y);
-                                          }
+                                          AI.Creep.Behavior.Idle.atPoint(creep, creep.memory.checkedOutSource);
                                        }
                                     }
                                  }
@@ -269,17 +234,8 @@ var AIHarvester = {
                         //Energy not full, lets harvest
                         //Try to mine source from given source point
                         let point = creep.memory.checkedOutSource;
-                        let pos = creep.pos;
 
-                        //Check if we are on correct source point
-                        if (point.x == pos.x && point.y == pos.y) {
-                           //Attempt to harvest source from source point
-                           creep.harvest(Game.getObjectById(point.source));
-                        }
-                        else {
-                           //Move to correct sourcePoint
-                           creep.moveTo(point.x, point.y);
-                        }
+                        AI.Creep.Behavior.Harvest.targetFromPoint(creep, Game.getObjectById(point.source), point);
                      }
                   }
                }
