@@ -17,7 +17,7 @@ var Utility = {
         /*
          * Returns true if func is undefined, or returns the return value of func by passing it value
          */
-        ifDefinedIsItTrue: function(func, value) {
+        ifFunctionIsDefinedAndTrue: function(func, value) {
             return (func) ? (func(value)) : (true);
         },
         isCreepRole: function(creep, role) {
