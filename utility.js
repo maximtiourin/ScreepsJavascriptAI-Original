@@ -97,6 +97,20 @@ var Utility = {
             });
             return sites;
         },
+        allStructuresInRoom(room, ownership = 0, strictOwnership = false, additionalFilter = undefined) {
+            let structures = room.find(FIND_STRUCTURES, {
+                filter: function(structure) {
+                    if (Utility.Evaluate.isStructureOwnedBy(structure, ownership, strictOwnership)) {
+                        if (Utility.Evaluate.undefinedBooleanFunction(additionalFilter, structure)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            });
+            return structures;
+        },
         allStructuresOfTypeInRoom: function(room, type, ownership = 0, strictOwnership = false, additionalFilter = undefined) {
             let structures = room.find(FIND_STRUCTURES, {
                 filter: function(structure) {

@@ -6,13 +6,13 @@ var AIBuilder = {
       return creep.carry.energy == creep.carryCapacity;
    },
    /*
-    * Applies a filter value to a construction site, allowing it to be sorted in ascending order of most priority (0) to least priority (999)
+    * Applies a filter value to an object with the property 'structureType', allowing it to be sorted in ascending order of most priority (0) to least priority (999)
     */
-   filterConstructionSites: function(site) {
-      if (site.structureType === STRUCTURE_CONTAINER) {
+   filterStructureTypes: function(e) {
+      if (e.structureType === STRUCTURE_CONTAINER) {
          return 0;
       }
-      else if (site.structureType === STRUCTURE_EXTENSION) {
+      else if (e.structureType === STRUCTURE_EXTENSION) {
          return 1;
       }
       else {
@@ -80,7 +80,7 @@ var AIBuilder = {
                if (sites.length > 0) {
                   //Build construction site
                   //Group construction sites by their priority
-                  let groupedSites = _.groupBy(sites, t.filterConstructionSites);
+                  let groupedSites = _.groupBy(sites, t.filterStructureTypes);
 
                   //Get the group with the highest priority
                   let groupKey = Object.keys(groupedSites)[0];
@@ -97,7 +97,30 @@ var AIBuilder = {
                   AI.Creep.Behavior.Build.target(creep, prioritySite);
                }
                else {
-                  // {TODO} Look for something to repair
+                  //Look for something to repair
+                  //Get all of my structures that need repairing
+                  let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                     return structure.hits < structure.hitsMax;
+                  });
+
+                  if (structures.length > 0) {
+                     //Group structures by their priority
+                     let groupedStructures = _.groupBy(structures, t.filterStructureTypes);
+
+                     //Get the group with the highest priority
+                     let groupKey = Object.keys(groupedStructures)[0];
+                     let priorityGroup = groupedStructures[groupKey];
+
+                     //Sort that group for distanceSquared
+                     let sortedStructures = _.sortBy(priorityGroup, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+
+                     //Select our priority structure
+                     let sortedKey = Object.keys(sortedStructures)[0];
+                     let priorityStructure = sortedStructures[sortedKey];
+
+                     //Attempt to repair priority structure
+                     AI.Creep.Behavior.Repair(creep, priorityStructure);
+                  }
                }
             }
          }
