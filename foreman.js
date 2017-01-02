@@ -14,12 +14,13 @@ var Foreman = {
             //Check if spawn not currently spawning something
             if (!spawn.spawning) {
                if (Foreman.manageCreepCounts.manageHarvester(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageRefueler(spawn)) ;
                else if (Foreman.manageCreepCounts.manageBuilder(spawn)) ;
             }
          }
       },
       manageBuilder: function (spawn) {
-         let BUILDERS_PER_ROOM = 8;
+         let BUILDERS_PER_ROOM = 6;
 
          let room = spawn.room;
          let roomMem = room.memory;
@@ -88,6 +89,50 @@ var Foreman = {
          }
 
          return false;
+      },
+      manageRefueler: function (spawn) {
+         let REFUELERS_PER_ROOM = 4;
+
+         let room = spawn.room;
+         let roomMem = room.memory;
+
+         //[CACHED] Check if we have atleast one built sourceContainer
+         let haveBuiltContainer = TickCache.cache('Foreman_haveBuiltSourceContainer', function() {
+            if (roomMem.sourceContainerPointsGenerated) {
+               for (let key in roomMem.sourceContainerPoints) {
+                  let point = roomMem.sourceContainerPoints[key];
+
+                  //Check to see if there's a built container structure at point
+                  let found = room.lookForAt(LOOK_STRUCTURES, point.x, point.y);
+                  if (found.length > 0) {
+                     for (let subkey in found) {
+                        let structure = found[subkey];
+
+                        if (structure.structureType === STRUCTURE_CONTAINER) {
+                           //Found a built container
+                           return true;
+                        }
+                     }
+                  }
+               }
+            }
+
+            return false;
+         });
+
+         if (haveBuiltContainer) {
+            //We have a built container, lets check if we need any more refuelers spawned
+            let refuelerCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_REFUELER, room);
+
+            if (refuelerCount < REFUELERS_PER_ROOM) {
+               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+                  Factory.Creep.RefuelerSmall.spawn(spawn);
+                  return true;
+               }
+            }
+         }
+
+         return false;
       }
    },
    tickCreeps: function() {
@@ -101,11 +146,18 @@ var Foreman = {
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_BUILDER)) {
             AIBuilder.tick(creep);
          }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_REFUELER)) {
+            AIRefueler.tick(creep);
+         }
       }
+   },
+   tickTowers: function() {
+
    },
    tick: function() {
       Foreman.manageCreepCounts.manage();
 
+      Foreman.tickTowers();
       Foreman.tickCreeps();
    }     
 };

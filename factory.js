@@ -1,6 +1,7 @@
 var Factory = {
    ROLE_BUILDER: "builder",
    ROLE_HARVESTER: "harvester",
+   ROLE_REFUELER: "refueler",
    ROLE_UPGRADER: "upgrader",
    ROLE_WORKER: "worker",
    Creep: {
@@ -26,6 +27,21 @@ var Factory = {
          role: "harvester",
          spawn: function (spawner, name = undefined) {
             let t = Factory.Creep.HarvesterSmall;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Game.time);
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
+         }
+      },
+      RefuelerSmall: {
+         baseName: "Refueler",
+         body: [WORK, CARRY, CARRY, MOVE, MOVE],
+         cost: 300,
+         role: "refueler",
+         spawn: function (spawner, name = undefined) {
+            let t = Factory.Creep.RefuelerSmall;
 
             let body = t.body;
             let role = t.role;

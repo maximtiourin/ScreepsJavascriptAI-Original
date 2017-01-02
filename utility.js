@@ -156,6 +156,9 @@ var Utility = {
         }
     },
     Math: {
+        clamp: function(value, min, max) {
+            return Math.max(Math.min(value, max), min);
+        },
         /*
          * Takes two objects that have properties 'x' and 'y' to find the distance squared between them
          */
