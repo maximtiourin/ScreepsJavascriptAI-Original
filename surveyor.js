@@ -99,7 +99,7 @@ var Surveyor = {
                      //{ TODO:delete this } Generate debug flag on the point and set memory
                      let flagName = "sourceContainerPoint::" + sourceId;
                      room.createFlag(pathStep.x, pathStep.y, flagName, colorPRIMARY, colorSECONDARY);
-                     
+
                      //sourceContainerPoint memory
                      mem.sourceContainerPoints[sourceId] = {x: pathStep.x, y: pathStep.y};
                   }
