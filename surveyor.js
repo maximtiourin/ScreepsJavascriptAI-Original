@@ -98,12 +98,10 @@ var Surveyor = {
 
                      //{ TODO:delete this } Generate debug flag on the point and set memory
                      let flagName = "sourceContainerPoint::" + sourceId;
-                     let flagRet = room.createFlag(pathStep.x, pathStep.y, flagName, colorPRIMARY, colorSECONDARY);
-
-                     if (flagRet === flagName) {
-                        //Flag created successfully, set sourceContainerPoint memory
-                        mem.sourceContainerPoints[sourceId] = {x: pathStep.x, y: pathStep.y};
-                     }
+                     room.createFlag(pathStep.x, pathStep.y, flagName, colorPRIMARY, colorSECONDARY);
+                     
+                     //sourceContainerPoint memory
+                     mem.sourceContainerPoints[sourceId] = {x: pathStep.x, y: pathStep.y};
                   }
                   else {
                      console.log("Error: {generateRoomSourceContainerPoints} Surveyor can not find path from " + spawn.name + " to Source::" + sourceId);

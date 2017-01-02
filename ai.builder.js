@@ -9,14 +9,19 @@ var AIBuilder = {
     * Applies a filter value to an object with the property 'structureType', allowing it to be sorted in ascending order of most priority (0) to least priority (999)
     */
    filterStructureTypes: function(e) {
-      if (e.structureType === STRUCTURE_RAMPART) {
-         return 0;
-      }
-      else if (e.structureType === STRUCTURE_CONTAINER) {
+      if (e.structureType === STRUCTURE_CONTAINER) {
          return 1;
       }
       else if (e.structureType === STRUCTURE_EXTENSION) {
          return 2;
+      }
+      else {
+         return 999;
+      }
+   },
+   filterContainersWithEnoughEnergy: function(e, ...[energy]) {
+      if (e.store[RESOURCE_ENERGY] >= energy) {
+         return 0;
       }
       else {
          return 999;
@@ -49,26 +54,11 @@ var AIBuilder = {
                //Find the closest container to refuel at, prioritizing containers that can fully fill this creep's carry
                let containers = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_CONTAINER);
                if (containers.length > 0) {
-                  let desirableContainers = _.filter(containers, function(container) {
-                     return container.store[RESOURCE_ENERGY] >= t.getEnergyLeftToFill(creep);
-                  });
-
-                  let filterContainers = [];
-                  if (desirableContainers.length > 0) {
-                     //Add only desirable containers to distance filtering list
-                     _.forEach(desirableContainers, function(value) {
-                        filterContainers.push(value);
-                     });
-                  }
-                  else {
-                     //No desirable containers, add undesirables to distance filtering list
-                     _.forEach(containers, function(value) {
-                        filterContainers.push(value);
-                     });
-                  }
+                  //Get desirable containers by first trying to retrieve a group of containers that can fully refuel this creep, then settling for any
+                  let filterContainers = Utility.Group.first(containers, t.filterContainersWithEnoughEnergy, t.getEnergyLeftToFill(creep));
 
                   //Sort filter containers by distanceSquared
-                  let sortedFilterContainers = _.sortBy(filterContainers, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+                  let sortedFilterContainers = Utility.Sort.Position.distanceSquared(filterContainers, creep);
 
                   //Select closest container to refuel from
                   let closestContainer = sortedFilterContainers[0];
@@ -82,19 +72,14 @@ var AIBuilder = {
 
                if (sites.length > 0) {
                   //Build construction site
-                  //Group construction sites by their priority
-                  let groupedSites = _.groupBy(sites, t.filterStructureTypes);
-
-                  //Get the group with the highest priority
-                  let groupKey = Object.keys(groupedSites)[0];
-                  let priorityGroup = groupedSites[groupKey];
+                  //Get the group of constructionSite structuresTypes that have priority
+                  let priorityGroup = Utility.Group.first(sites, t.filterStructureTypes);
 
                   //Sort that group for distanceSquared
-                  let sortedPriorities = _.sortBy(priorityGroup, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+                  let sortedPriorities = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
 
                   //Select our priority site
-                  let sortedKey = Object.keys(sortedPriorities)[0];
-                  let prioritySite = sortedPriorities[sortedKey];
+                  let prioritySite = sortedPriorities[0];
 
                   //Attempt to build our priority site
                   AI.Creep.Behavior.Build.target(creep, prioritySite);
@@ -107,19 +92,14 @@ var AIBuilder = {
                   });
 
                   if (structures.length > 0) {
-                     //Group structures by their priority
-                     let groupedStructures = _.groupBy(structures, t.filterStructureTypes);
-
-                     //Get the group with the highest priority
-                     let groupKey = Object.keys(groupedStructures)[0];
-                     let priorityGroup = groupedStructures[groupKey];
+                     //Get the group of structure structuresTypes that have priority
+                     let priorityGroup = Utility.Group.first(structures, t.filterStructureTypes);
 
                      //Sort that group for distanceSquared
-                     let sortedStructures = _.sortBy(priorityGroup, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+                     let sortedStructures = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
 
                      //Select our priority structure
-                     let sortedKey = Object.keys(sortedStructures)[0];
-                     let priorityStructure = sortedStructures[sortedKey];
+                     let priorityStructure = sortedStructures[0];
 
                      //Attempt to repair priority structure
                      AI.Creep.Behavior.Repair.target(creep, priorityStructure);

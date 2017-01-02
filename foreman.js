@@ -24,40 +24,38 @@ var Foreman = {
          let room = spawn.room;
          let roomMem = room.memory;
 
-         //Check if we have atleast one built sourceContainer
-         if (roomMem.sourceContainerPointsGenerated) {
-            let haveBuiltContainer = false;
-            for (let key in roomMem.sourceContainerPoints) {
-               let point = roomMem.sourceContainerPoints[key];
+         //[CACHED] Check if we have atleast one built sourceContainer
+         let haveBuiltContainer = TickCache.cache('Foreman_haveBuiltSourceContainer', function() {
+            if (roomMem.sourceContainerPointsGenerated) {
+               for (let key in roomMem.sourceContainerPoints) {
+                  let point = roomMem.sourceContainerPoints[key];
 
-               //Check to see if there's a built container structure at point
-               let found = room.lookForAt(LOOK_STRUCTURES, point.x, point.y);
-               if (found.length > 0) {
-                  for (let subkey in found) {
-                     let structure = found[subkey];
+                  //Check to see if there's a built container structure at point
+                  let found = room.lookForAt(LOOK_STRUCTURES, point.x, point.y);
+                  if (found.length > 0) {
+                     for (let subkey in found) {
+                        let structure = found[subkey];
 
-                     if (structure.structureType === STRUCTURE_CONTAINER) {
-                        //Found a built container, exit loop
-                        haveBuiltContainer = true;
-                        break;
+                        if (structure.structureType === STRUCTURE_CONTAINER) {
+                           //Found a built container
+                           return true;
+                        }
                      }
                   }
                }
-
-               if (haveBuiltContainer) {
-                  break;
-               }
             }
 
-            if (haveBuiltContainer) {
-               //We have a built container, lets check if we need any more builders spawned
-               let builderCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_BUILDER, room);
+            return false;
+         });
 
-               if (builderCount < BUILDERS_PER_ROOM) {
-                  if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
-                     Factory.Creep.BuilderSmall.spawn(spawn);
-                     return true;
-                  }
+         if (haveBuiltContainer) {
+            //We have a built container, lets check if we need any more builders spawned
+            let builderCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_BUILDER, room);
+
+            if (builderCount < BUILDERS_PER_ROOM) {
+               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+                  Factory.Creep.BuilderSmall.spawn(spawn);
+                  return true;
                }
             }
          }

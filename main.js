@@ -6,6 +6,7 @@ global.Factory =              global.Factory             || require('factory');
 global.Foreman =              global.Foreman             || require('foreman');
 global.GarbageCollector =     global.GarbageCollector    || require('garbagecollector');
 global.Surveyor =             global.Surveyor            || require('surveyor');
+global.TickCache =            global.TickCache           || require('tickcache');
 global.Utility =              global.Utility             || require('utility');
 
 

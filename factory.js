@@ -5,9 +5,10 @@ var Factory = {
    ROLE_WORKER: "worker",
    Creep: {
       BuilderSmall: {
-         body: [WORK, CARRY, CARRY, MOVE, MOVE],
-         role: "builder",
          baseName: "Builder",
+         body: [WORK, CARRY, CARRY, MOVE, MOVE],
+         cost: 300,
+         role: "builder",
          spawn: function (spawner, name = undefined) {
             let t = Factory.Creep.BuilderSmall;
 
@@ -19,9 +20,10 @@ var Factory = {
          }
       },
       HarvesterSmall: {
-         body: [WORK, CARRY, CARRY, MOVE, MOVE],
-         role: "harvester",
          baseName: "Harvester",
+         body: [WORK, CARRY, CARRY, MOVE, MOVE],
+         cost: 300,
+         role: "harvester",
          spawn: function (spawner, name = undefined) {
             let t = Factory.Creep.HarvesterSmall;
 

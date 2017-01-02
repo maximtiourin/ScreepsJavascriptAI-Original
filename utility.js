@@ -75,6 +75,33 @@ var Utility = {
             return null;
         }
     },
+    Group: {
+        /*
+         * Groups the elements of the collection by the value they return when run through the filter.
+         *
+         * By default, filter should take as its argument the element of the collection, 
+         * but can be supplied additional arguments as a rest parameter.
+         *
+         * Returns the first group based on the order in which the groups were generated
+         */
+        first: function(collection, filter, ...filterArgs) {
+            //Group structures by their priority
+             let groups = _.groupBy(collection, function(value) {
+                if (filterArgs && filterArgs.length > 0) {
+                    return filter(value, filterArgs);
+                }
+                else {
+                    return filter(value);
+                }
+             });
+
+             //Get the first group
+             let groupKey = Object.keys(groups)[0];
+             let firstGroup = groups[groupKey];
+
+             return firstGroup;
+        }
+    },
     List: {
         allConstructionSitesInRoom: function(room, ownership = 0, additionalFilter = undefined) {
             let sites = room.find(FIND_CONSTRUCTION_SITES, {
@@ -136,6 +163,17 @@ var Utility = {
             let dx = b.x - a.x;
             let dy = b.y - a.y;
             return (dx * dx) + (dy * dy);
+        }
+    },
+    Sort: {
+        Position: {
+            /*
+             * Returns a new sorted collection by comparing the distanceSquared between obj.pos and collection->element.pos
+             * where pos is an object that has properties 'x' and 'y'
+             */
+            distanceSquared: function(collection, obj) {
+                return _.sortBy(collection, [function(o) { return Utility.Math.distanceSquared(obj.pos, o.pos) }])
+            }
         }
     }
 };

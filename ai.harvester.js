@@ -122,7 +122,7 @@ var AIHarvester = {
                   }
                }
 
-               //Sort points by distanceSquared, least to most
+               //Sort points by distanceSquared from creep position, least to most
                let sortedPoints = _.sortBy(collapsedPoints, [function(o) { return Utility.Math.distanceSquared(creep.pos, o) }]);
 
                //Go through sorted points and find the first one that isn't currently checked out
@@ -212,7 +212,7 @@ var AIHarvester = {
 
                                        if (spawns.length > 0) {
                                           //Sort by distanceSquared
-                                          spawnsSorted = _.sortBy(spawns, [function(o) { return Utility.Math.distanceSquared(creep.pos, o.pos) }]);
+                                          spawnsSorted = Utility.Sort.Position.distanceSquared(spawns, creep);
 
                                           //Select closest spawn
                                           let spawn = spawnsSorted[0];
