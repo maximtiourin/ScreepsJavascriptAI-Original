@@ -4,6 +4,7 @@ global.AIBuilder =            global.AIBuilder           || require('ai.builder'
 global.AIHarvester =          global.AIHarvester         || require('ai.harvester');
 global.AIRefueler =           global.AIRefueler          || require('ai.refueler');
 global.AITower =              global.AITower             || require('ai.tower');
+global.AIUpgrader =           global.AIUpgrader          || require('ai.upgrader');
 global.Factory =              global.Factory             || require('factory');
 global.Foreman =              global.Foreman             || require('foreman');
 global.GarbageCollector =     global.GarbageCollector    || require('garbagecollector');

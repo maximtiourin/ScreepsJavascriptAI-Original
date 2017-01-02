@@ -16,6 +16,7 @@ var Foreman = {
                if (Foreman.manageCreepCounts.manageHarvester(spawn)) ;
                else if (Foreman.manageCreepCounts.manageRefueler(spawn)) ;
                else if (Foreman.manageCreepCounts.manageBuilder(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageUpgrader(spawn)) ;
             }
          }
       },
@@ -133,6 +134,86 @@ var Foreman = {
          }
 
          return false;
+      },
+      manageUpgrader: function (spawn) {
+         let UPGRADERS_PER_ROOM = 2;
+
+         let room = spawn.room;
+         let roomMem = room.memory;
+
+         //[CACHED] Check if we have atleast one built sourceContainer
+         let haveBuiltContainer = TickCache.cache('Foreman_haveBuiltSourceContainer', function() {
+            if (roomMem.sourceContainerPointsGenerated) {
+               for (let key in roomMem.sourceContainerPoints) {
+                  let point = roomMem.sourceContainerPoints[key];
+
+                  //Check to see if there's a built container structure at point
+                  let found = room.lookForAt(LOOK_STRUCTURES, point.x, point.y);
+                  if (found.length > 0) {
+                     for (let subkey in found) {
+                        let structure = found[subkey];
+
+                        if (structure.structureType === STRUCTURE_CONTAINER) {
+                           //Found a built container
+                           return true;
+                        }
+                     }
+                  }
+               }
+            }
+
+            return false;
+         });
+
+         if (haveBuiltContainer) {
+            //We have a built container, lets check if we need any more upgraders spawned
+            let upgraderCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_UPGRADER, room);
+
+            if (upgraderCount < UPGRADERS_PER_ROOM) {
+               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+                  Factory.Creep.UpgraderMedium.spawn(spawn);
+                  return true;
+               }
+            }
+         }
+
+         return false;
+      }
+   },
+   manageEmergencies: {
+      manage: function() {
+         let t = Foreman.manageEmergencies;
+
+         let spawns = Game.spawns;
+         for (let index in spawns) {
+            let spawn = spawns[index];
+
+            let room = spawn.room;
+
+            t.manageSafeMode(room);            
+         }
+      },
+      manageSafeMode: function(room) {
+         let controller = room.controller;
+
+         if (controller) {
+            if (!controller.safeMode && !controller.safeModeCooldown && controller.safeModeAvailable > 0) {
+               //Check if any enemies in room
+               let enemies = room.find(FIND_HOSTILE_CREEPS);
+
+               if (enemies.length > 0) {
+                  //Check if we have a tower that can defend itself
+                  let towers = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_TOWER, Utility.OWNERSHIP_MINE, true, function(tower) {
+                     return tower.energy >= 10;
+                  });
+
+                  if (towers.length <= 0) {
+                     //Activate safe mode, we don't have a capable tower
+                     controller.activateSafeMode();
+                  }
+               }
+            }
+         }
       }
    },
    tickCreeps: function() {
@@ -148,6 +229,9 @@ var Foreman = {
          }
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_REFUELER)) {
             AIRefueler.tick(creep);
+         }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_UPGRADER)) {
+            AIUpgrader.tick(creep);
          }
       }
    },
@@ -170,6 +254,7 @@ var Foreman = {
    },
    tick: function() {
       Foreman.manageCreepCounts.manage();
+      Foreman.manageEmergencies.manage();
 
       Foreman.tickTowers();
       Foreman.tickCreeps();
