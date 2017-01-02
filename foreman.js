@@ -19,7 +19,7 @@ var Foreman = {
          }
       },
       manageBuilder: function (spawn) {
-         let BUILDERS_PER_ROOM = 4;
+         let BUILDERS_PER_ROOM = 8;
 
          let room = spawn.room;
          let roomMem = room.memory;
