@@ -35,6 +35,10 @@ var Surveyor = {
                //Maintain atleast 10 extensions
                t.maintainExtensionsForLevel(room, 10);
             }
+            else if (level == 4) {
+               //Maintain atleast 20 extensions
+               t.maintainExtensionsForLevel(room, 20);
+            }
          }
       },
       isValidExtensionPlacementAtPoint: function(room, point) {
@@ -75,8 +79,15 @@ var Surveyor = {
                   return false;
                }
             }
-            else if (obj.type === LOOK_STRUCTURES || obj.type === LOOK_CONSTRUCTION_SITES) {
-               return false;
+            else if (obj.type === LOOK_STRUCTURES) {
+               if (obj.structure.structureType !== STRUCTURE_ROAD && obj.structure.structureType !== STRUCTURE_RAMPART) {
+                  return false;
+               }
+            }
+            else if (obj.type === LOOK_CONSTRUCTION_SITES) {
+               if (obj.constructionSite.structureType !== STRUCTURE_ROAD && obj.constructionSite.structureType !== STRUCTURE_RAMPART) {
+                  return false;
+               }
             }
          }
 
@@ -92,8 +103,6 @@ var Surveyor = {
 
          let count = t.countExtensionSitesAndStructures(room);
 
-         //console.log("Extension Limit " + limit + ", current count is " + count);
-
          if (count < limit) {
             //Find a valid placement for a new extension site
             let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, true);
@@ -106,8 +115,6 @@ var Surveyor = {
                let xmax = Utility.Math.clamp(center.x + MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_WIDTH - 1 - BORDER_OFFSET);
                let ymin = Utility.Math.clamp(center.y - MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_HEIGHT - 1 - BORDER_OFFSET);
                let ymax = Utility.Math.clamp(center.y + MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_HEIGHT - 1 - BORDER_OFFSET);
-
-               //console.log("x : [" + xmin + ", " + xmax + "], y : [" + ymin + ", " + ymax + "]");
 
                for (let x = xmin; x <= xmax; x++) {
                   for (let y = ymin; y <= ymax; y++) {
@@ -239,6 +246,130 @@ var Surveyor = {
          }
       }
    },
+   Tower: {
+      countTowers: function(room) {
+         //[CACHED] Count how many towers are built or being built
+         let count = TickCache.cache('Surveyor_countTowers', function() {
+            let sites = Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE, function(site) {
+               return site.structureType === STRUCTURE_TOWER;
+            });
+
+            let structures = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_TOWER, Utility.OWNERSHIP_MINE, true);
+
+            return sites.length + structures.length;
+         });
+
+         return count;
+      },
+      generateRoomTowers: function(room) {
+         let t = Surveyor.Tower;
+
+         let controller = room.controller;
+
+         if (controller) {
+            let level = controller.level;
+
+            if (level == 3) {
+               //Maintain atleast 1 tower
+               t.maintainTowersForLevel(room, 1);
+            }
+            else if (level == 4) {
+               //Maintain atleast 1 tower
+               t.maintainTowersForLevel(room, 1);
+            }
+         }
+      },
+      isValidTowerPlacementAtPoint: function(room, point) {
+         let t = Surveyor.Tower;
+
+         //Make sure point is empty and a valid tile, then Check 4 cardinal direction top, bot, left, right for emptiness only
+         //Center
+         if (!t.isValidTowerPoint(room, point)) {
+            return false;
+         }
+         //Top
+         if (!t.isValidTowerPoint(room, {'x': point.x, 'y': point.y - 1})) {
+            return false;
+         }
+         //Bot
+         if (!t.isValidTowerPoint(room, {'x': point.x, 'y': point.y + 1})) {
+            return false;
+         }
+         //Left
+         if (!t.isValidTowerPoint(room, {'x': point.x - 1, 'y': point.y})) {
+            return false;
+         }
+         //Right
+         if (!t.isValidTowerPoint(room, {'x': point.x + 1, 'y': point.y})) {
+            return false;
+         }
+
+         return true;
+      },
+      isValidTowerPoint: function(room, point) {
+         let centerLook = room.lookAt(point.x, point.y);
+
+         for (let index in centerLook) {
+            let obj = centerLook[index];
+
+            if (obj.type === LOOK_TERRAIN) {
+               if (obj.terrain === 'wall') {
+                  return false;
+               }
+            }
+            else if (obj.type === LOOK_STRUCTURES) {
+               if (obj.structure.structureType !== STRUCTURE_ROAD && obj.structure.structureType !== STRUCTURE_RAMPART) {
+                  return false;
+               }
+            }
+            else if (obj.type === LOOK_CONSTRUCTION_SITES) {
+               if (obj.constructionSite.structureType !== STRUCTURE_ROAD && obj.constructionSite.structureType !== STRUCTURE_RAMPART) {
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      },
+      maintainTowersForLevel: function(room, limit) {
+         let ROOM_WIDTH = Surveyor.Dimensions.ROOM_WIDTH;
+         let ROOM_HEIGHT = Surveyor.Dimensions.ROOM_HEIGHT;
+         let BORDER_OFFSET = Surveyor.Dimensions.ROOM_BORDER_OFFSET + 6;
+         let MAX_DISTANCE_FROM_SPAWN = Math.round(ROOM_WIDTH / 6.0);
+
+         let t = Surveyor.Tower;
+
+         let count = t.countTowers(room);
+
+         if (count < limit) {
+            //Find a valid placement for a new tower site
+            let spawns = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_SPAWN, Utility.OWNERSHIP_MINE, true);
+
+            if (spawns.length > 0) {
+               let spawn = spawns[0];
+               let center = spawn.pos;
+
+               let xmin = Utility.Math.clamp(center.x - MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_WIDTH - 1 - BORDER_OFFSET);
+               let xmax = Utility.Math.clamp(center.x + MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_WIDTH - 1 - BORDER_OFFSET);
+               let ymin = Utility.Math.clamp(center.y - MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_HEIGHT - 1 - BORDER_OFFSET);
+               let ymax = Utility.Math.clamp(center.y + MAX_DISTANCE_FROM_SPAWN, BORDER_OFFSET, ROOM_HEIGHT - 1 - BORDER_OFFSET);
+
+               for (let x = xmin; x <= xmax; x++) {
+                  for (let y = ymin; y <= ymax; y++) {
+                     let point = {'x': x, 'y': y};
+
+                     if (t.isValidTowerPlacementAtPoint(room, point)) {
+                        room.createConstructionSite(point.x, point.y, STRUCTURE_TOWER);
+                        return true;
+                     }
+                  }
+               }
+            }
+         }
+
+         return false;
+      }
+   },
    survey: function() {
       let t = Surveyor;
       for (let name in Game.rooms) {
@@ -247,6 +378,7 @@ var Surveyor = {
          t.Source.generateRoomSourcePoints(room);
          t.Source.generateRoomSourceContainerPoints(room);
          t.Extension.generateRoomExtensions(room);
+         t.Tower.generateRoomTowers(room);
       }
    }   
 };

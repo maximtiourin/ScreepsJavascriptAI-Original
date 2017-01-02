@@ -152,7 +152,21 @@ var Foreman = {
       }
    },
    tickTowers: function() {
+      let spawns = Game.spawns;
 
+      for (let index in spawns) {
+         let spawn = Game.spawns[index];
+
+         let room = spawn.room;
+
+         let towers = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_TOWER, Utility.OWNERSHIP_MINE, true);
+
+         for (let towerIndex in towers) {
+            let tower = towers[towerIndex];
+
+            AITower.tick(tower);
+         }
+      }
    },
    tick: function() {
       Foreman.manageCreepCounts.manage();

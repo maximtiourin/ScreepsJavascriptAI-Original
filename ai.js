@@ -87,6 +87,19 @@ var AI = {
             }
          }
       }
+   },
+   Tower: {
+      Behavior: {
+         Attack: function(tower, target) {
+            tower.attack(target);
+         },
+         Heal: function(tower, target) {
+            tower.heal(target);
+         },
+         Repair: function(tower, target) {
+            tower.repair(target);
+         }
+      }
    }
 }
 

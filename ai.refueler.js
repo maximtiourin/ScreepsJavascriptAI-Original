@@ -15,6 +15,9 @@ var AIRefueler = {
       else if (e.structureType === STRUCTURE_EXTENSION) {
          return 2;
       }
+      else if (e.structureType === STRUCTURE_TOWER) {
+         return 3;
+      }
       else {
          return 999;
       }
