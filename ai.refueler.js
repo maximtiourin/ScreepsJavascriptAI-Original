@@ -69,8 +69,7 @@ var AIRefueler = {
             else {
                //Find a priority structure to refuel that needs fuel
                let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-                  return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) 
-                        && (structure.energy < structure.energyCapacity);
+                  return (structure.energy < structure.energyCapacity);
                });
 
                if (structures.length > 0) {

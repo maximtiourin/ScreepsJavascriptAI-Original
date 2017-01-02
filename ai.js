@@ -90,14 +90,20 @@ var AI = {
    },
    Tower: {
       Behavior: {
-         Attack: function(tower, target) {
-            tower.attack(target);
+         Attack: {
+            target: function(tower, target) {
+               tower.attack(target);
+            }
          },
-         Heal: function(tower, target) {
-            tower.heal(target);
+         Heal: {
+            target: function(tower, target) {
+               tower.heal(target);
+            }
          },
-         Repair: function(tower, target) {
-            tower.repair(target);
+         Repair: {
+            target: function(tower, target) {
+               tower.repair(target);
+            }
          }
       }
    }

@@ -17,6 +17,8 @@ var AITower = {
       }
    },
    tick: function(tower) {
+      let t = AITower;
+
       let room = tower.room;
 
       //First check if we should try to attack something
@@ -27,7 +29,7 @@ var AITower = {
 
          let target = sortedEnemies[0];
 
-         AI.Tower.Behavior.Attack(tower, target);
+         AI.Tower.Behavior.Attack.target(tower, target);
       }
       else {
          //Check if we should try to repair something
