@@ -22,6 +22,20 @@ var AIBuilder = {
          return 999;
       }
    },
+   filterStructureRefuelTypes: function(e) {
+      if (e.structureType === STRUCTURE_SPAWN) {
+         return 1;
+      }
+      else if (e.structureType === STRUCTURE_EXTENSION) {
+         return 2;
+      }
+      else if (e.structureType === STRUCTURE_TOWER) {
+         return 3;
+      }
+      else {
+         return 999;
+      }
+   },
    filterContainersWithEnoughEnergy: function(e, ...[energy]) {
       if (e.store[RESOURCE_ENERGY] >= energy) {
          return 0;
@@ -108,8 +122,25 @@ var AIBuilder = {
                      AI.Creep.Behavior.Repair.target(creep, priorityStructure);
                   }
                   else {
-                     //Try to upgrade controller instead of idling
-                     AI.Creep.Behavior.Upgrade.target(creep, room.controller);
+                     //Look for something to refuel
+                     //Find a priority structure to refuel that needs fuel
+                     let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                        return (structure.energy < structure.energyCapacity);
+                     });
+
+                     if (structures.length > 0) {
+                        let priorityGroup = Utility.Group.first(structures, t.filterStructureRefuelTypes);
+
+                        let sortedPriorityGroup = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
+
+                        let closestStructure = sortedPriorityGroup[0];
+
+                        AI.Creep.Behavior.Refuel.target(creep, closestStructure, RESOURCE_ENERGY);
+                     }
+                     else {
+                        //Try to upgrade controller instead of idling
+                        AI.Creep.Behavior.Upgrade.target(creep, room.controller);
+                     }
                   }
                }
             }
