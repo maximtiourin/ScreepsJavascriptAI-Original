@@ -175,7 +175,7 @@ var Utility = {
              * where pos is an object that has properties 'x' and 'y'
              */
             distanceSquared: function(collection, obj) {
-                return _.sortBy(collection, [function(o) { return Utility.Math.distanceSquared(obj.pos, o.pos) }])
+                return _.sortBy(collection, function(o) { return Utility.Math.distanceSquared(obj.pos, o.pos) });
             }
         }
     }

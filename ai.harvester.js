@@ -123,7 +123,7 @@ var AIHarvester = {
                }
 
                //Sort points by distanceSquared from creep position, least to most
-               let sortedPoints = _.sortBy(collapsedPoints, [function(o) { return Utility.Math.distanceSquared(creep.pos, o) }]);
+               let sortedPoints = _.sortBy(collapsedPoints, function(o) { return Utility.Math.distanceSquared(creep.pos, o) });
 
                //Go through sorted points and find the first one that isn't currently checked out
                let checkedOut = false;
