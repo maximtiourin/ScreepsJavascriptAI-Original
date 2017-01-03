@@ -14,11 +14,11 @@ global.Utility =              global.Utility             || require('utility');
 
 
 module.exports.loop = function() {
-   //Calculate room source point arrays
-   Surveyor.survey();
-
    //Free unused memory
    GarbageCollector.freeUnusedMemory();
+
+   //Calculate room source point arrays
+   Surveyor.survey();
 
    //Foreman tick
    Foreman.tick();

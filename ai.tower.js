@@ -31,19 +31,37 @@ var AITower = {
 
          AI.Tower.Behavior.Attack.target(tower, target);
       }
-      else {
+      else if (tower.energy > (tower.energyCapacity / 4)) {
          //Check if we should try to repair something
          //Get all of my structures that need repairing that are equal to or below 20% of their health, to prevent wasting tower energy
          let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-            return (structure.hits / (structure.hitsMax * 1.0)) <= .20;
+            if (structure.structureType === STRUCTURE_RAMPART) {
+               return structure.hits <= 60000;
+            }
+            else if (structure.structureType === STRUCTURE_WALL) {
+               return structure.hits <= 10000;
+            }
+            else {
+               return (structure.hits / (structure.hitsMax * 1.0)) <= .20;
+            }
          });
 
          if (structures.length > 0) {
             //Get the group of structure structuresTypes that have priority
-            let priorityGroup = Utility.Group.first(structures, t.filterStructureTypes);
+            //let priorityGroup = Utility.Group.first(structures, t.filterStructureTypes);
 
-            //Sort that group for distanceSquared
-            let sortedStructures = Utility.Sort.Position.distanceSquared(priorityGroup, tower);
+            //Sort that group for structureHits
+            let sortedStructures = _.sortBy(structures, function(o) {
+               if (o.structureType === STRUCTURE_RAMPART && o.hits <= 1000) {
+                  return 0;
+               }
+               else if (o.structureType === STRUCTURE_WALL && o.hits <= 500) {
+                  return 1;
+               }
+               else {
+                  return Utility.Math.distanceSquared(o.pos, tower.pos) + 10; //Add arbitrary weight to distance so priority is always higher above
+               }
+            });
 
             //Select our priority structure
             let priorityStructure = sortedStructures[0];

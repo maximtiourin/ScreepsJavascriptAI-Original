@@ -105,7 +105,15 @@ var AIBuilder = {
                   //Look for something to repair
                   //Get all of my structures that need repairing
                   let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-                     return structure.hits < structure.hitsMax;
+                     if (structure.structureType === STRUCTURE_RAMPART) {
+                        return structure.hits <= 60000;
+                     }
+                     else if (structure.structureType === STRUCTURE_WALL) {
+                        return structure.hits <= 10000;
+                     }
+                     else {
+                        return structure.hits < structure.hitsMax;
+                     }
                   });
 
                   if (structures.length > 0) {

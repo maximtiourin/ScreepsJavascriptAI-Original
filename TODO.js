@@ -7,4 +7,13 @@
  * 
  * - Implement dynamic growth of builder limit for foreman based on conditions such as controller level, container spare resources, and maybe other factors
  *       EX: (2 * SourceCount) + ((Get All Currently Available Energy in Containers / getCurrentBuilderModel.energyCost) - 1)
+ *
+ *
+ *
+ * - STRETCH REWORK
+ *       - Modify how harvesting works so that a harvester is something like maximum WORK up to 5, 1 carry, 1 move, one harvester per source no matter what.
+            Harvester will refuel spawns if no refuelers exist, otherwise harvester will mine in place no matter what
+ *       - New refueler specialized unit [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], 1 refueler per source, ONLY refuels things while prioritizing picking up lose energy
+            and bringing it to spawn -> extension -> container -> storage
+         - Containers are only built 1 per source, and only once harvesters 
  */
