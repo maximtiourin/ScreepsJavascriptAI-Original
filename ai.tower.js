@@ -33,9 +33,9 @@ var AITower = {
       }
       else {
          //Check if we should try to repair something
-         //Get all of my structures that need repairing
+         //Get all of my structures that need repairing that are equal to or below 20% of their health, to prevent wasting tower energy
          let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-            return structure.hits < structure.hitsMax;
+            return (structure.hits / (structure.hitsMax * 1.0)) <= .20;
          });
 
          if (structures.length > 0) {

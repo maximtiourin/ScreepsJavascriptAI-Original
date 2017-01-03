@@ -124,12 +124,12 @@ var AIBuilder = {
                   else {
                      //Look for something to refuel
                      //Find a priority structure to refuel that needs fuel
-                     let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                     let refuelStructures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
                         return (structure.energy < structure.energyCapacity);
                      });
 
-                     if (structures.length > 0) {
-                        let priorityGroup = Utility.Group.first(structures, t.filterStructureRefuelTypes);
+                     if (refuelStructures.length > 0) {
+                        let priorityGroup = Utility.Group.first(refuelStructures, t.filterStructureRefuelTypes);
 
                         let sortedPriorityGroup = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
 
