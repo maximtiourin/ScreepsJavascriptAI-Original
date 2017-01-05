@@ -15,6 +15,16 @@ var AI = {
          },
          Harvest: {
             /*
+             * Attempts to harvest the given target, moving to it if not in range
+             */
+            target: function(creep, target) {
+              let ret = creep.harvest(target);
+
+              if (ret == ERR_NOT_IN_RANGE) {
+                creep.moveTo(target);
+              }
+            },
+            /*
              * Attempts to harvest the given target while standing on the given point,
              * moving to the given point if not already on it
              */
@@ -38,6 +48,18 @@ var AI = {
                if (!(point.x == pos.x && point.y == pos.y)) {
                   creep.moveTo(point.x, point.y);
                }
+            }
+         },
+         Pickup: {
+            /*
+             * Attempts to pickup the given target, moving to it if not in range
+             */
+            target: function(creep, target) {
+              let ret = creep.pickup(target);
+
+              if (ret == ERR_NOT_IN_RANGE) {
+                creep.moveTo(target);
+              }
             }
          },
          RangedAttack: {

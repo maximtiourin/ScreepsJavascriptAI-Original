@@ -2,6 +2,27 @@ var Utility = {
     OWNERSHIP_ANY: 0,
     OWNERSHIP_MINE: 1,
     OWNERSHIP_ENEMY: 2,
+    GUID: {
+        /*
+         * Generates a guid for the given basename such that it is as low as possible while being unique
+         * for that basename
+         */
+        creepGenerate: function(baseName) {
+            let n = 0;
+
+            let done = false;
+            while (!done) {
+                if (Game.creeps[(baseName + n)]) {
+                    n++;
+                }
+                else {
+                    done = true;
+                }
+            }
+
+            return n;
+        }
+    },
     Count: {
         containerResources: function(container) {
             return _.sum(container.store);

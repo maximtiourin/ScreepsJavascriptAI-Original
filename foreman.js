@@ -2,6 +2,8 @@
  * The foreman container is responsible for all task delegation for its sub containers
  */
 var Foreman = {
+   FLAG_DEPLOYMENT: "DeploymentFlag",
+   FLAG_LONGRANGEHARVESTING: "LongRangeHarvestingFlag",
    /*
     * Maintains predefined creep count for individual rooms that contain a self owned spawner
     */
@@ -14,9 +16,11 @@ var Foreman = {
             //Check if spawn not currently spawning something
             if (!spawn.spawning) {
                if (Foreman.manageCreepCounts.manageHarvester(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageReclaimer(spawn)) ;
                else if (Foreman.manageCreepCounts.manageRefueler(spawn)) ;
                else if (Foreman.manageCreepCounts.manageBuilder(spawn)) ;
                else if (Foreman.manageCreepCounts.manageUpgrader(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageLongRangeHarvester(spawn)) ;
             }
          }
       },
@@ -86,6 +90,80 @@ var Foreman = {
             if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
                Factory.Creep.HarvesterSmall.spawn(spawn);
                return true;
+            }
+         }
+
+         return false;
+      },
+      manageLongRangeHarvester: function(spawn) {
+         let room = spawn.room;
+         let roomMem = room.memory;
+         let controller = room.controller;
+
+         if (controller) {
+            if (controller.level >= 3) {
+               let flags = Game.flags;
+
+               for (let key in flags) {
+                  let flag = flags[key];
+
+                  if (key.indexOf(Foreman.FLAG_LONGRANGEHARVESTING) !== -1) {
+                     //This is a LRH flag.
+                     let harvesterCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_LONGRANGEHARVESTER, room, function(creep) { return creep.memory.targetFlag === key });
+
+                     if (harvesterCount < 5) {
+                        if (room.energyAvailable > (room.energyCapacityAvailable / 3) && room.energyAvailable >= Factory.Creep.LongRangeHarvester.cost) {
+                           //Create deployed LRH
+                           Factory.Creep.LongRangeHarvester.spawn(spawn, key);
+                           return true;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
+         return false;
+      },
+      manageReclaimer: function (spawn) {
+         let RECLAIMERS_PER_ROOM = 2;
+
+         let room = spawn.room;
+         let roomMem = room.memory;
+
+         //[CACHED] Check if we have atleast one built sourceContainer
+         let haveBuiltContainer = TickCache.cache('Foreman_haveBuiltSourceContainer', function() {
+            if (roomMem.sourceContainerPointsGenerated) {
+               for (let key in roomMem.sourceContainerPoints) {
+                  let point = roomMem.sourceContainerPoints[key];
+
+                  //Check to see if there's a built container structure at point
+                  let found = room.lookForAt(LOOK_STRUCTURES, point.x, point.y);
+                  if (found.length > 0) {
+                     for (let subkey in found) {
+                        let structure = found[subkey];
+
+                        if (structure.structureType === STRUCTURE_CONTAINER) {
+                           //Found a built container
+                           return true;
+                        }
+                     }
+                  }
+               }
+            }
+
+            return false;
+         });
+
+         if (haveBuiltContainer) {
+            //We have a built container, lets check if we need any more reclaimers spawned
+            let reclaimerCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_RECLAIMER, room);
+
+            if (reclaimerCount < RECLAIMERS_PER_ROOM) {
+               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+                  Factory.Creep.Reclaimer.spawn(spawn);
+                  return true;
+               }
             }
          }
 
@@ -278,7 +356,7 @@ var Foreman = {
                for (let key in flags) {
                   let flag = flags[key];
 
-                  if (key.indexOf("DeploymentFlag") !== -1) {
+                  if (key.indexOf(Foreman.FLAG_DEPLOYMENT) !== -1) {
                      //This is a deployment flag.
                      let cleanserCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_CLEANSER, room, function(creep) { return creep.memory.targetFlag === key });
 
@@ -305,6 +383,9 @@ var Foreman = {
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_BUILDER)) {
             AIBuilder.tick(creep);
          }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_RECLAIMER)) {
+            AIReclaimer.tick(creep);
+         }
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_REFUELER)) {
             AIRefueler.tick(creep);
          }
@@ -313,6 +394,9 @@ var Foreman = {
          }
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_CLEANSER)) {
             AICleanser.tick(creep);
+         }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_LONGRANGEHARVESTER)) {
+            AILongRangeHarvester.tick(creep);
          }
       }
    },

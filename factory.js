@@ -2,12 +2,14 @@ var Factory = {
    ROLE_BUILDER: "builder",
    ROLE_CLEANSER: "cleanser",
    ROLE_HARVESTER: "harvester",
+   ROLE_LONGRANGEHARVESTER: "longrangeharvester",
+   ROLE_RECLAIMER: "reclaimer",
    ROLE_REFUELER: "refueler",
    ROLE_UPGRADER: "upgrader",
    ROLE_WORKER: "worker",
    Creep: {
       BuilderSmall: {
-         baseName: "Builder",
+         baseName: "B:",
          body: [WORK, CARRY, CARRY, MOVE, MOVE],
          cost: 300,
          role: "builder",
@@ -16,13 +18,13 @@ var Factory = {
 
             let body = t.body;
             let role = t.role;
-            let finalname = name || (t.baseName + Game.time);
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
          }
       },
       Cleanser: {
-         baseName: "Cleanser",
+         baseName: "Cleanser:",
          body: [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE],
          cost: 600,
          role: "cleanser",
@@ -31,7 +33,7 @@ var Factory = {
 
             let body = t.body;
             let role = t.role;
-            let finalname = name || (t.baseName + Game.time);
+            let finalname = name || (t.baseName + Utility.GUID.generate());
 
             if (targetFlag) {
                spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetRoom": targetRoom, "targetFlag": targetFlag});
@@ -42,8 +44,8 @@ var Factory = {
          }
       },
       HarvesterSmall: {
-         baseName: "Harvester",
-         body: [WORK, CARRY, CARRY, MOVE, MOVE],
+         baseName: "H:",
+         body: [WORK, WORK, CARRY, MOVE],
          cost: 300,
          role: "harvester",
          spawn: function (spawner, name = undefined) {
@@ -51,13 +53,43 @@ var Factory = {
 
             let body = t.body;
             let role = t.role;
-            let finalname = name || (t.baseName + Game.time);
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
          }
       },
+      LongRangeHarvester: {
+         baseName: "LRH:",
+         body: [WORK, CARRY, MOVE],
+         cost: 200,
+         role: "longrangeharvester",
+         spawn: function (spawner, targetFlag, name = undefined) {
+            let t = Factory.Creep.LongRangeHarvester;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetFlag": targetFlag });
+         }
+      },
+      Reclaimer: {
+         baseName: "Rec:",
+         body: [CARRY, MOVE],
+         cost: 150,
+         role: "reclaimer",
+         spawn: function (spawner, name = undefined) {
+            let t = Factory.Creep.Reclaimer;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetSpawn": spawner.id });
+         }
+      },
       RefuelerSmall: {
-         baseName: "Refueler",
+         baseName: "Rfl:",
          body: [WORK, CARRY, CARRY, MOVE, MOVE],
          cost: 300,
          role: "refueler",
@@ -66,13 +98,13 @@ var Factory = {
 
             let body = t.body;
             let role = t.role;
-            let finalname = name || (t.baseName + Game.time);
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
          }
       },
       UpgraderMedium: {
-         baseName: "Upgrader",
+         baseName: "Upg:",
          body: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
          cost: 500,
          role: "upgrader",
@@ -81,7 +113,7 @@ var Factory = {
 
             let body = t.body;
             let role = t.role;
-            let finalname = name || (t.baseName + Game.time);
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
          }
