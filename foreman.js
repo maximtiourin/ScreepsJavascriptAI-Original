@@ -126,7 +126,7 @@ var Foreman = {
          return false;
       },
       manageReclaimer: function (spawn) {
-         let RECLAIMERS_PER_ROOM = 2;
+         let RECLAIMERS_PER_ROOM = 1;
 
          let room = spawn.room;
          let roomMem = room.memory;
