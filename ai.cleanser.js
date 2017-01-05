@@ -22,21 +22,26 @@ var AICleanser = {
                   let enemy = sortedEnemies[0];
 
                   //Find path between creep and enemy
-                  let pathfind = PathFinder.search(creep.pos, {"pos": enemy.pos, "range": 3});
+                  /*let pathfind = PathFinder.search(creep.pos, {"pos": enemy.pos, "range": 3});
 
                   if (pathfind.path.length > 0) {
                      let step = pathfind.path[0];
 
                      //Move towards step in path
                      creep.move(creep.pos.getDirectionTo(step));
-                  }
+                  }*/
+
+                  //Move closer to enemy
+                  creep.moveTo(enemy);
 
                   let closeEnemyCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
                   if (closeEnemyCreeps.length > 0) {
+                     //Attack enemy
                      let e = closeEnemyCreeps[0];
                      AI.Creep.Behavior.RangedAttack.target(creep, e);
                   }
                   else {
+                     //Try to attack a structure just to be useful
                      let closeEnemyStructures = creep.pos.findInRange(FIND_STRUCTURES, 3, {
                         filter: function(struct) {
                            return struct.structureType === STRUCTURE_WALL || !struct.my;
@@ -80,6 +85,8 @@ var AICleanser = {
                            let flag = Game.flags[creepMem.targetFlag];
 
                            flag.remove();
+
+                           delete creepMem.targetFlag;
                         }
                      }
                   }

@@ -24,8 +24,31 @@ var AITower = {
       //First check if we should try to attack something
       let enemies = room.find(FIND_HOSTILE_CREEPS);
       if (enemies.length > 0) {
-         //Sort Enemies by distance to tower
-         let sortedEnemies = _.sortBy(enemies, [function(o) { return Utility.Math.distanceSquared(tower.pos, o.pos) }]);
+         //Sort Enemies by heal body parts, to attack body parts, to distance
+         let sortedEnemies = _.sortBy(enemies, function(o) {
+            let bodyObjects = o.body;
+
+            let hasHeal = _.some(bodyObjects, function(value) {
+               return value.type === HEAL;
+            });
+
+            let hasAttack = _.some(bodyObjects, function(value) {
+               return value.type === ATTACK || value.type === RANGED_ATTACK;
+            });
+
+            if (hasHeal && hasAttack) {
+               return 0;
+            }
+            else if (hasHeal) {
+               return 1;
+            }
+            else if (hasAttack) {
+               return 2;
+            }
+            else {
+               return Utility.Math.distanceSquared(tower.pos, o.pos) + 10;
+            }
+         });
 
          let target = sortedEnemies[0];
 
