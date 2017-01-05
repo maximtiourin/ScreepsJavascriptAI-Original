@@ -105,8 +105,8 @@ var Factory = {
       },
       UpgraderMedium: {
          baseName: "Upg:",
-         body: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-         cost: 500,
+         body: [WORK, WORK, WORK, CARRY, MOVE],
+         cost: 400,
          role: "upgrader",
          spawn: function (spawner, name = undefined) {
             let t = Factory.Creep.UpgraderMedium;
