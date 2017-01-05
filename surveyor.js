@@ -39,6 +39,10 @@ var Surveyor = {
                //Maintain atleast 20 extensions
                t.maintainExtensionsForLevel(room, 20);
             }
+            else if (level == 5) {
+               //Maintain atleast 30 extensions
+               t.maintainExtensionsForLevel(room, 30);
+            }
          }
       },
       isValidExtensionPlacementAtPoint: function(room, point) {
@@ -276,6 +280,10 @@ var Surveyor = {
             else if (level == 4) {
                //Maintain atleast 1 tower
                t.maintainTowersForLevel(room, 1);
+            }
+            else if (level == 5) {
+               //Maintain atleast 2 towers
+               t.maintainTowersForLevel(room, 2);
             }
          }
       },
