@@ -16,6 +16,13 @@ var GarbageCollector = {
              delete Memory.rooms[name];
          }
       }
+
+      //Clean up removed flag memory
+      for (let name in Memory.flags) {
+         if (!Game.flags[name]) {
+             delete Memory.flags[name];
+         }
+      }
    }
 };
 
