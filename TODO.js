@@ -13,7 +13,7 @@
  * - STRETCH REWORK
  *       - Modify how harvesting works so that a harvester is something like maximum WORK up to 5, 1 carry, 1 move, one harvester per source no matter what.
             Harvester will refuel spawns if no refuelers exist, otherwise harvester will mine in place no matter what
- *       - New refueler specialized unit [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], 1 refueler per source, ONLY refuels things while prioritizing picking up lose energy
+ *       - New refueler specialized unit [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE], 1 refueler limit per source, ONLY refuels things while prioritizing picking up loose energy
             and bringing it to spawn -> extension -> container -> storage
-         - Containers are only built 1 per source, and only once harvesters 
+         - Containers are only built 1 per source, and only once builders start being spawned (or something like that) 
  */

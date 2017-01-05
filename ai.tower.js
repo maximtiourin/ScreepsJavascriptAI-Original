@@ -39,7 +39,7 @@ var AITower = {
                return structure.hits <= 60000;
             }
             else if (structure.structureType === STRUCTURE_WALL) {
-               return structure.hits <= 10000;
+               return structure.hits <= 60000;
             }
             else {
                return (structure.hits / (structure.hitsMax * 1.0)) <= .20;

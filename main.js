@@ -1,6 +1,9 @@
 //Define global structure
+global.ENABLE_WAR = false;
+
 global.AI =                   global.AI                  || require('ai');
 global.AIBuilder =            global.AIBuilder           || require('ai.builder');
+global.AICleanser =           global.AICleanser          || require('ai.cleanser');
 global.AIHarvester =          global.AIHarvester         || require('ai.harvester');
 global.AIRefueler =           global.AIRefueler          || require('ai.refueler');
 global.AITower =              global.AITower             || require('ai.tower');

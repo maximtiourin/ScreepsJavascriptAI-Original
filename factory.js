@@ -1,5 +1,6 @@
 var Factory = {
    ROLE_BUILDER: "builder",
+   ROLE_CLEANSER: "cleanser",
    ROLE_HARVESTER: "harvester",
    ROLE_REFUELER: "refueler",
    ROLE_UPGRADER: "upgrader",
@@ -18,6 +19,26 @@ var Factory = {
             let finalname = name || (t.baseName + Game.time);
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
+         }
+      },
+      Cleanser: {
+         baseName: "Cleanser",
+         body: [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE],
+         cost: 600,
+         role: "cleanser",
+         spawn: function (spawner, targetRoom, name = undefined, targetFlag = undefined) {
+            let t = Factory.Creep.Cleanser;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Game.time);
+
+            if (targetFlag) {
+               spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetRoom": targetRoom, "targetFlag": targetFlag});
+            }
+            else {
+               spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetRoom": targetRoom});
+            }
          }
       },
       HarvesterSmall: {

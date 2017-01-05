@@ -216,6 +216,84 @@ var Foreman = {
          }
       }
    },
+   manageWar: {
+      manage: function() {
+         let t = Foreman.manageWar;
+
+         if (ENABLE_WAR) {
+            let spawns = Game.spawns;
+            for (let index in spawns) {
+               let spawn = spawns[index];
+
+               let room = spawn.room;
+
+               t.manageBorderExpansion(room, spawn);            
+            }
+         }
+         else {
+            //Flag-based cleansers
+            let spawns = Game.spawns;
+            for (let index in spawns) {
+               let spawn = spawns[index];
+
+               let room = spawn.room;
+
+               t.manageDeployment(room, spawn);            
+            }
+         }
+      },
+      manageBorderExpansion: function(room, spawn) {
+         let controller = room.controller;
+
+         if (controller) {
+            if (controller.level >= 3) {
+               let exits = Game.map.describeExits(room.name);
+
+               if (exits) {
+                  for (let key in exits) {
+                     let exit = exits[key];
+
+                     let cleanserCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_CLEANSER, room, function(creep) { return creep.memory.targetRoom === exit });
+
+                     if (cleanserCount < 1) {
+                        if (room.energyAvailable == room.energyCapacityAvailable) {
+                           //console.log("Spawn Cleanser towards: " + exit);
+
+                           //Full on energy, lets use it to 'expand'
+                           Factory.Creep.Cleanser.spawn(spawn, exit);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      manageDeployment: function(room, spawn) {
+         let controller = room.controller;
+
+         if (controller) {
+            if (controller.level >= 3) {
+               let flags = Game.flags;
+
+               for (let key in flags) {
+                  let flag = flags[key];
+
+                  if (key.indexOf("DeploymentFlag") !== -1) {
+                     //This is a deployment flag.
+                     let cleanserCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_CLEANSER, room, function(creep) { return creep.memory.targetFlag === key });
+
+                     if (cleanserCount < 1) {
+                        if (room.energyAvailable >= Factory.Creep.Cleanser.cost) {
+                           //Create deployed cleanser
+                           Factory.Creep.Cleanser.spawn(spawn, undefined, undefined, key);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
    tickCreeps: function() {
       let creeps = Game.creeps;
       for (let index in creeps) {
@@ -232,6 +310,9 @@ var Foreman = {
          }
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_UPGRADER)) {
             AIUpgrader.tick(creep);
+         }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_CLEANSER)) {
+            AICleanser.tick(creep);
          }
       }
    },
@@ -255,6 +336,7 @@ var Foreman = {
    tick: function() {
       Foreman.manageCreepCounts.manage();
       Foreman.manageEmergencies.manage();
+      Foreman.manageWar.manage();
 
       Foreman.tickTowers();
       Foreman.tickCreeps();

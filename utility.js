@@ -9,8 +9,10 @@ var Utility = {
         creepsOfRole: function(role) {
             return _.sum(Game.creeps, (creep) => { return creep.memory.role === role });
         },
-        creepsOfRoleAssignedToRoom: function(role, room) {
-            return _.sum(Game.creeps, (creep) => { return (creep.memory.role === role) && (creep.memory.assignedRoom === room.name) });
+        creepsOfRoleAssignedToRoom: function(role, room, additionalFilter = undefined) {
+            return _.sum(Game.creeps, (creep) => { 
+                return (creep.memory.role === role) && (creep.memory.assignedRoom === room.name) && (!additionalFilter || additionalFilter(creep)); 
+            });
         }
     },
     Evaluate: {

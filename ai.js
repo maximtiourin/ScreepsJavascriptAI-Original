@@ -40,6 +40,16 @@ var AI = {
                }
             }
          },
+         RangedAttack: {
+            target: function(creep, target) {
+              creep.rangedAttack(target);
+            }
+         },
+         RangedMassAttack: {
+            cleave: function(creep) {
+              creep.rangedMassAttack();
+            }
+         },
          Refuel: {
             /*
              * Attempts to refuel from the target with the given resourceType, moving to it if not in range
