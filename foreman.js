@@ -265,7 +265,7 @@ var Foreman = {
                      else {
                         //Check if we need to preemptively spawn a reserver, so that the reservation doesnt lapse before the new one can get there
                         let expiringReservers = _.filter(Game.creeps, function(creep) {
-                           return (crepe.memory.role === Factory.ROLE_RESERVER) && (creep.memory.assignedRoom === room.name) && (creep.memory.targetFlag === key)
+                           return (creep.memory.role === Factory.ROLE_RESERVER) && (creep.memory.assignedRoom === room.name) && (creep.memory.targetFlag === key)
                                  && (creep.ticksToLive < TICKS_TO_LAPSE);
                         });
 
