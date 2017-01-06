@@ -1,21 +1,4 @@
 var AIUpgrader = {
-   isEnergyEmpty: function(creep) {
-      return creep.carry.energy == 0;
-   },
-   isEnergyFull: function(creep) {
-      return creep.carry.energy == creep.carryCapacity;
-   },
-   filterContainersWithEnoughEnergy: function(e, ...[energy]) {
-      if (e.store[RESOURCE_ENERGY] >= energy) {
-         return 0;
-      }
-      else {
-         return 999;
-      }
-   },
-   getEnergyLeftToFill: function(creep) {
-      return creep.carryCapacity - creep.carry.energy;
-   },
    tick: function(creep) {
       let t = AIUpgrader;
 
@@ -26,10 +9,10 @@ var AIUpgrader = {
          if (room) {
             let roomMem = room.memory;
 
-            if (creepMem.isRefueling && t.isEnergyFull(creep)) {
+            if (creepMem.isRefueling && Utility.Evaluate.isCreepEnergyFull(creep)) {
                creepMem.isRefueling = false;
             }
-            else if (!creepMem.isRefueling && t.isEnergyEmpty(creep)) {
+            else if (!creepMem.isRefueling && Utility.Evaluate.isCreepEnergyEmpty(creep)) {
                creepMem.isRefueling = true;
             }
 

@@ -7,12 +7,9 @@ var AI = {
              * Attempts to build construction sites in the room, moving to them if necessary.
              * Looks for the closest target factoring in a structureType priority.
              * Returns false if no valid construction sites.
-             * [Uses TickCaching]
              */
             myConstructionSites: function(room, creep) {
-              let sites = TickCache.cache("List.allConstructionSitesInRoom.my::" + room.name, function() {
-                return Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE);
-              });
+              let sites = Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE);
 
               if (sites.length > 0) {
                 //Build construction site
@@ -122,14 +119,12 @@ var AI = {
                * If its close to its target, and its target has no energy to give, the creep will move around 
                * a bit in order to prevent blockage.
                * Returns false if no valid energy storage structures.
-               * [Uses TickCaching]
                */
               energyFromContainer: function(room, creep) {
-                let containers = TickCache.cache("List.allStructuresInRoom.myEnergyStorage::" + room.name, function() {
-                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-                    return structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE;
-                  });
+                let containers = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                  return structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE;
                 });
+
                 if (containers.length > 0) {
                   //Get desirable containers by first trying to retrieve a group of containers that can fully refuel this creep, then settling for any
                   let filterContainers = Utility.Group.first(containers, Utility.Filter.Priority.containersWithEnoughEnergy, Utility.Count.creepEnergyLeftToFill(creep));
@@ -161,9 +156,7 @@ var AI = {
                 }
               },
               energyMyStructures: function(room, creep) {
-                let refuelStructures = TickCache.cache("List.allStructuresInRoom.myNeedRefueling::" + room.name, function() {
-                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.refuelStructures);
-                });
+                let refuelStructures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.refuelStructures);
 
                 if (refuelStructures.length > 0) {
                   let priorityGroup = Utility.Group.first(refuelStructures, Utility.Filter.Priority.refuelStructures);
@@ -205,9 +198,7 @@ var AI = {
          Repair: {
             Advanced: {
               myStructures: function(room, creep) {
-                let structures = TickCache.cache("List.allStructuresInRoom.myNeedRepairing::" + room.name, function() {
-                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.repairStructures);
-                });
+                let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.repairStructures);
 
                 if (structures.length > 0) {
                    //Get the group of structure structuresTypes that have priority
