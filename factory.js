@@ -2,9 +2,11 @@ var Factory = {
    ROLE_BUILDER: "builder",
    ROLE_CLEANSER: "cleanser",
    ROLE_HARVESTER: "harvester",
+   ROLE_HAULER: "hauler",
    ROLE_LONGRANGEHARVESTER: "longrangeharvester",
    ROLE_RECLAIMER: "reclaimer",
    ROLE_REFUELER: "refueler",
+   ROLE_RESERVER: "reserver",
    ROLE_UPGRADER: "upgrader",
    ROLE_WORKER: "worker",
    Creep: {
@@ -58,6 +60,21 @@ var Factory = {
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
          }
       },
+      Hauler: {
+         baseName: "Hlr:",
+         body: [CARRY, MOVE],
+         cost: 100,
+         role: "hauler",
+         spawn: function (spawner, name = undefined) {
+            let t = Factory.Creep.Hauler;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
+         }
+      },
       LongRangeHarvester: {
          baseName: "LRH:",
          body: [WORK, CARRY, MOVE],
@@ -76,7 +93,7 @@ var Factory = {
       Reclaimer: {
          baseName: "Rec:",
          body: [CARRY, MOVE],
-         cost: 150,
+         cost: 100,
          role: "reclaimer",
          spawn: function (spawner, name = undefined) {
             let t = Factory.Creep.Reclaimer;
@@ -101,6 +118,21 @@ var Factory = {
             let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
 
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
+         }
+      },
+      Reserver: {
+         baseName: "RSV:",
+         body: [CLAIM, MOVE],
+         cost: 650,
+         role: "reserver",
+         spawn: function (spawner, targetFlag, name = undefined) {
+            let t = Factory.Creep.Reserver;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetFlag": targetFlag });
          }
       },
       UpgraderMedium: {

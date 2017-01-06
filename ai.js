@@ -72,6 +72,15 @@ var AI = {
               creep.rangedMassAttack();
             }
          },
+         Recycle: {
+            self: function(creep, spawn) {
+              let ret = spawn.recycleCreep(creep);
+
+              if (ret == ERR_NOT_IN_RANGE) {
+                creep.moveTo(spawn);
+              }
+            }
+         },
          Refuel: {
             /*
              * Attempts to refuel from the target with the given resourceType, moving to it if not in range
@@ -100,6 +109,18 @@ var AI = {
              */
             target: function(creep, target) {
                let ret = creep.repair(target);
+
+               if (ret == ERR_NOT_IN_RANGE) {
+                  creep.moveTo(target);
+               }
+            }
+         },
+         Reserve: {
+            /*
+             * Attempts to reserve the target, moving to it if not in range
+             */
+            target: function(creep, target) {
+               let ret = creep.reserveController(target);
 
                if (ret == ERR_NOT_IN_RANGE) {
                   creep.moveTo(target);

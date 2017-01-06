@@ -110,12 +110,28 @@ var AILongRangeHarvester = {
                         delete creepMem.targetContainer;
                      }
                   }
+                  else {
+                     delete creepMem.targetContainer;
+                  }
                }
                else {
-                  let containers = Utility.List.allStructuresOfTypeInRoom(room, STRUCTURE_CONTAINER);
+                  let containers = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                     return structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE;
+                  });
                   if (containers.length > 0) {
-                     let sortedContainers = _.sortBy(containers, function(container) {
-                        return Utility.Count.containerResources(container);
+                     let sortedContainers = _.sortBy(containers, function(structure) {
+                        //Weigh the containers by fillPercentage and their distanceSquare
+                        let percentage = 1.0;
+                        if (structure.structureType === STRUCTURE_STORAGE) {
+                           //Convert storage percentage to container percentage, prioritize storage
+                           percentage = Utility.Count.containerResources(structure) / 1000000.0;
+                        }
+                        else {
+                           //Must be a regular container
+                           percentage = (Utility.Count.containerResources(structure) / 2000.0) * 1.2;
+                        }
+
+                        return percentage; //unlike reclaimer, LRH doesnt compare distance, due to 'cheap' distanceSquared calculation not being simple between rooms
                      });
 
                      let container = sortedContainers[0];

@@ -4,6 +4,7 @@
 var Foreman = {
    FLAG_DEPLOYMENT: "DeploymentFlag",
    FLAG_LONGRANGEHARVESTING: "LongRangeHarvestingFlag",
+   FLAG_RESERVATION: "ReservationFlag",
    /*
     * Maintains predefined creep count for individual rooms that contain a self owned spawner
     */
@@ -21,6 +22,8 @@ var Foreman = {
                else if (Foreman.manageCreepCounts.manageBuilder(spawn)) ;
                else if (Foreman.manageCreepCounts.manageUpgrader(spawn)) ;
                else if (Foreman.manageCreepCounts.manageLongRangeHarvester(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageReserver(spawn)) ;
+               else if (Foreman.manageCreepCounts.manageHauler(spawn)) ;
             }
          }
       },
@@ -95,7 +98,30 @@ var Foreman = {
 
          return false;
       },
+      manageHauler: function (spawn) {
+         let HAULERS_PER_ROOM = 3;
+
+         let room = spawn.room;
+         let roomMem = room.memory;
+
+         if (room.storage && (Utility.Count.containerResources(room.storage) < room.storage.storeCapacity)) {
+            //Count how many haulers we currently have assigned to this room
+            let haulerCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_HAULER, room);
+
+            if (haulerCount < HAULERS_PER_ROOM) {
+               //Attempt to spawn a harvester
+               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+                  Factory.Creep.Hauler.spawn(spawn);
+                  return true;
+               }
+            }
+         }
+
+         return false;
+      },
       manageLongRangeHarvester: function(spawn) {
+         let HARVESTERS_PER_FLAG = 5;
+
          let room = spawn.room;
          let roomMem = room.memory;
          let controller = room.controller;
@@ -111,7 +137,7 @@ var Foreman = {
                      //This is a LRH flag.
                      let harvesterCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_LONGRANGEHARVESTER, room, function(creep) { return creep.memory.targetFlag === key });
 
-                     if (harvesterCount < 5) {
+                     if (harvesterCount < HARVESTERS_PER_FLAG) {
                         if (room.energyAvailable > (room.energyCapacityAvailable / 3) && room.energyAvailable >= Factory.Creep.LongRangeHarvester.cost) {
                            //Create deployed LRH
                            Factory.Creep.LongRangeHarvester.spawn(spawn, key);
@@ -207,6 +233,38 @@ var Foreman = {
                if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
                   Factory.Creep.RefuelerSmall.spawn(spawn);
                   return true;
+               }
+            }
+         }
+
+         return false;
+      },
+      manageReserver: function(spawn) {
+         let RESERVERS_PER_FLAG = 1;
+
+         let room = spawn.room;
+         let roomMem = room.memory;
+         let controller = room.controller;
+
+         if (controller) {
+            if (controller.level >= 3) {
+               let flags = Game.flags;
+
+               for (let key in flags) {
+                  let flag = flags[key];
+
+                  if (key.indexOf(Foreman.FLAG_RESERVATION) !== -1) {
+                     //This is a Reservation flag.
+                     let reserverCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_RESERVER, room, function(creep) { return creep.memory.targetFlag === key });
+
+                     if (reserverCount < RESERVERS_PER_FLAG) {
+                        if (room.energyAvailable >= Factory.Creep.Reserver.cost) {
+                           //Create deployed reserver
+                           Factory.Creep.Reserver.spawn(spawn, key);
+                           return true;
+                        }
+                     }
+                  }
                }
             }
          }
@@ -397,6 +455,12 @@ var Foreman = {
          }
          else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_LONGRANGEHARVESTER)) {
             AILongRangeHarvester.tick(creep);
+         }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_RESERVER)) {
+            AIReserver.tick(creep);
+         }
+         else if (Utility.Evaluate.isCreepRole(creep, Factory.ROLE_HAULER)) {
+            AIHauler.tick(creep);
          }
       }
    },
