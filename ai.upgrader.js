@@ -34,34 +34,8 @@ var AIUpgrader = {
             }
 
             if (creepMem.isRefueling) {
-               //Find the closest container to refuel at, prioritizing containers that can fully fill this creep's carry
-               let containers = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
-                  return structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE;
-               });
-               if (containers.length > 0) {
-                  //Get desirable containers by first trying to retrieve a group of containers that can fully refuel this creep, then settling for any
-                  let filterContainers = Utility.Group.first(containers, t.filterContainersWithEnoughEnergy, t.getEnergyLeftToFill(creep));
-
-                  //Sort filter containers by distanceSquared
-                  let sortedFilterContainers = Utility.Sort.Position.distanceSquared(filterContainers, creep);
-
-                  //Select closest container to refuel from
-                  let closestContainer = sortedFilterContainers[0];
-
-                  //See if we need to move away from an empty container
-                  let moveAway = false;
-                  if (Utility.Math.distanceSquared(creep.pos, closestContainer.pos) < 4) {
-                     if (closestContainer.store[RESOURCE_ENERGY] == 0) {
-                        //Move away from container to free up space
-                        moveAway = true;
-                        creep.moveTo(room.controller);
-                     }
-                  }
-
-                  if (!moveAway) {
-                     AI.Creep.Behavior.Refuel.fromTarget(creep, closestContainer, RESOURCE_ENERGY);
-                  }
-               }
+               //Refuel at closest energy storage
+               AI.Creep.Behavior.Refuel.Advanced.energyFromContainer(room, creep);
             }
             else {
                //Upgrade controller

@@ -34,7 +34,10 @@ var Utility = {
             return _.sum(Game.creeps, (creep) => { 
                 return (creep.memory.role === role) && (creep.memory.assignedRoom === room.name) && (!additionalFilter || additionalFilter(creep)); 
             });
-        }
+        },
+        creepEnergyLeftToFill: function(creep) {
+          return creep.carryCapacity - creep.carry.energy;
+        },
     },
     Evaluate: {
         /*
@@ -76,6 +79,21 @@ var Utility = {
             }
 
             return false;
+        }
+    },
+    Filter: {
+        Boolean: {
+
+        },
+        Priority: {
+            containersWithEnoughEnergy: function(e, ...[energy]) {
+                if (e.store[RESOURCE_ENERGY] >= energy) {
+                 return 0;
+                }
+                else {
+                 return 999;
+                }
+            }
         }
     },
     Get: {

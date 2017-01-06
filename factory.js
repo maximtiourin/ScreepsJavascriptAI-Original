@@ -135,6 +135,21 @@ var Factory = {
             spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name, "targetFlag": targetFlag });
          }
       },
+      UpgraderLarge: {
+         baseName: "Upg*:",
+         body: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+         cost: 1050,
+         role: "upgrader",
+         spawn: function (spawner, name = undefined) {
+            let t = Factory.Creep.UpgraderLarge;
+
+            let body = t.body;
+            let role = t.role;
+            let finalname = name || (t.baseName + Utility.GUID.creepGenerate(t.baseName));
+
+            spawner.createCreep(body, finalname, { "role": role, "assignedRoom": spawner.room.name });
+         }
+      },
       UpgraderMedium: {
          baseName: "Upg:",
          body: [WORK, WORK, WORK, CARRY, MOVE],

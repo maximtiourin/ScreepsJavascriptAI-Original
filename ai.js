@@ -82,6 +82,46 @@ var AI = {
             }
          },
          Refuel: {
+            Advanced: {
+              /*
+               * Attempts to refuel from a container/storage in the room, moving to it if necessary.
+               * Looks for the closest target that can fulfill its energy needs.
+               * If its close to its target, and its target has no energy to give, the creep will move around 
+               * a bit in order to prevent blockage.
+               * [Uses TickCaching]
+               */
+              energyFromContainer: function(room, creep) {
+                let containers = TickCache.cache("List.allStructuresInRoom.myEnergyStorage::" + room.name, function() {
+                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {
+                    return structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE;
+                  });
+                });
+                if (containers.length > 0) {
+                  //Get desirable containers by first trying to retrieve a group of containers that can fully refuel this creep, then settling for any
+                  let filterContainers = Utility.Group.first(containers, Utility.Filter.Priority.containersWithEnoughEnergy, Utility.Count.creepEnergyLeftToFill(creep));
+
+                  //Sort filter containers by distanceSquared
+                  let sortedFilterContainers = Utility.Sort.Position.distanceSquared(filterContainers, creep);
+
+                  //Select closest container to refuel from
+                  let closestContainer = sortedFilterContainers[0];
+
+                  //See if we need to move away from an empty container
+                  let moveAway = false;
+                  if (Utility.Math.distanceSquared(creep.pos, closestContainer.pos) < 4) {
+                     if (closestContainer.store[RESOURCE_ENERGY] == 0) {
+                        //Move away from container to free up space
+                        moveAway = true;
+                        creep.moveTo(room.controller);
+                     }
+                  }
+
+                  if (!moveAway) {
+                     AI.Creep.Behavior.Refuel.fromTarget(creep, closestContainer, RESOURCE_ENERGY);
+                  }
+                }
+              }
+            },
             /*
              * Attempts to refuel from the target with the given resourceType, moving to it if not in range
              */

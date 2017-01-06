@@ -289,7 +289,7 @@ var Foreman = {
          return false;
       },
       manageUpgrader: function (spawn) {
-         let UPGRADERS_PER_ROOM = 2;
+         let UPGRADERS_PER_ROOM = 2; //Default upgraders, before specialized checks
 
          let room = spawn.room;
          let roomMem = room.memory;
@@ -319,14 +319,40 @@ var Foreman = {
          });
 
          if (haveBuiltContainer) {
+            let upgraderVariant = Factory.Creep.UpgraderMedium; //Default variant
+            let maxUpgradersToSpawn = UPGRADERS_PER_ROOM; //Default, if we have a storage, more specialized numbers will be used to increase based on source
+
+            if (room.storage) {
+               if (room.energyCapacityAvailable > Factory.Creep.UpgraderLarge.cost) {
+                  upgraderVariant = Factory.Creep.UpgraderLarge;
+                  maxUpgradersToSpawn = 5;
+               }
+               else {
+                  maxUpgradersToSpawn = 8;
+               }
+            }
+
+            let upgraderCost = upgraderVariant.cost;
+
             //We have a built container, lets check if we need any more upgraders spawned
             let upgraderCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_UPGRADER, room);
 
-            if (upgraderCount < UPGRADERS_PER_ROOM) {
-               if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
-                  Factory.Creep.UpgraderMedium.spawn(spawn);
-                  return true;
+            let shouldSpawn = false;
+            if (Utility.Evaluate.isSpawnCurrentlyUsable(spawn)) {
+               if (upgraderCount < UPGRADERS_PER_ROOM) {
+                  shouldSpawn = true;
                }
+               else if (upgraderCount < maxUpgradersToSpawn) {
+                  //Only spawn additional if we are safely at more than twice the cost of the upgrader in available energy
+                  if (room.energyAvailable > upgraderCost) {
+                     shouldSpawn = true;
+                  }
+               }
+            }
+
+            if (shouldSpawn) {
+               upgraderVariant.spawn(spawn);
+               return true;
             }
          }
 
