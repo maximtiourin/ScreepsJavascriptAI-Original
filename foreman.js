@@ -240,7 +240,7 @@ var Foreman = {
          return false;
       },
       manageReserver: function(spawn) {
-         let RESERVERS_PER_FLAG = 2;
+         let RESERVERS_PER_FLAG = 1;
 
          let room = spawn.room;
          let roomMem = room.memory;
