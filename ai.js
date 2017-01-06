@@ -2,6 +2,39 @@ var AI = {
    Creep: {
       Behavior: {
          Build: {
+          Advanced: {
+            /*
+             * Attempts to build construction sites in the room, moving to them if necessary.
+             * Looks for the closest target factoring in a structureType priority.
+             * Returns false if no valid construction sites.
+             * [Uses TickCaching]
+             */
+            myConstructionSites: function(room, creep) {
+              let sites = TickCache("List.allConstructionSitesInRoom.my" + room.name, function() {
+                return Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE);
+              });
+
+              if (sites.length > 0) {
+                //Build construction site
+                //Get the group of constructionSite structuresTypes that have priority
+                let priorityGroup = Utility.Group.first(sites, Utility.Filter.Priority.buildStructures);
+
+                //Sort that group for distanceSquared
+                let sortedPriorities = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
+
+                //Select our priority site
+                let prioritySite = sortedPriorities[0];
+
+                //Attempt to build our priority site
+                AI.Creep.Behavior.Build.target(creep, prioritySite);
+
+                return true;
+              }
+              else {
+                return false;
+              }
+            }
+          },
             /*
              * Attempts to build the given target, moving to it if not in range
              */
@@ -88,6 +121,7 @@ var AI = {
                * Looks for the closest target that can fulfill its energy needs.
                * If its close to its target, and its target has no energy to give, the creep will move around 
                * a bit in order to prevent blockage.
+               * Returns false if no valid energy storage structures.
                * [Uses TickCaching]
                */
               energyFromContainer: function(room, creep) {
@@ -119,6 +153,11 @@ var AI = {
                   if (!moveAway) {
                      AI.Creep.Behavior.Refuel.fromTarget(creep, closestContainer, RESOURCE_ENERGY);
                   }
+
+                  return true;
+                }
+                else {
+                  return false;
                 }
               }
             },

@@ -72,24 +72,9 @@ var AIBuilder = {
                AI.Creep.Behavior.Refuel.Advanced.energyFromContainer(room, creep);
             }
             else {
-               //Find construction sites to build, priotizing accordingly. If there are no construction sites, find things to repair.
-               let sites = Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE);
-
-               if (sites.length > 0) {
-                  //Build construction site
-                  //Get the group of constructionSite structuresTypes that have priority
-                  let priorityGroup = Utility.Group.first(sites, t.filterStructureTypes);
-
-                  //Sort that group for distanceSquared
-                  let sortedPriorities = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
-
-                  //Select our priority site
-                  let prioritySite = sortedPriorities[0];
-
-                  //Attempt to build our priority site
-                  AI.Creep.Behavior.Build.target(creep, prioritySite);
-               }
-               else {
+               //Build my construction sites
+               let build = AI.Creep.Behavior.Build.Advanced.myConstructionSites(room, creep);
+               if (!build) {
                   //Look for something to repair
                   //Get all of my structures that need repairing
                   let structures = Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, function(structure) {

@@ -86,6 +86,20 @@ var Utility = {
 
         },
         Priority: {
+            buildStructures: function(e) {
+                if (e.structureType === STRUCTURE_CONTAINER) {
+                    return 1;
+                }
+                else if (e.structureType === STRUCTURE_EXTENSION) {
+                    return 2;
+                }
+                else if (e.structureType === STRUCTURE_TOWER) {
+                    return 3;
+                }
+                else {
+                    return 999;
+                }
+            },
             containersWithEnoughEnergy: function(e, ...[energy]) {
                 if (e.store[RESOURCE_ENERGY] >= energy) {
                  return 0;
