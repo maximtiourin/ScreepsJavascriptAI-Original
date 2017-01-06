@@ -241,6 +241,7 @@ var Foreman = {
       },
       manageReserver: function(spawn) {
          let RESERVERS_PER_FLAG = 1;
+         let TICKS_TO_LAPSE = 150;
 
          let room = spawn.room;
          let roomMem = room.memory;
@@ -257,7 +258,23 @@ var Foreman = {
                      //This is a Reservation flag.
                      let reserverCount = Utility.Count.creepsOfRoleAssignedToRoom(Factory.ROLE_RESERVER, room, function(creep) { return creep.memory.targetFlag === key });
 
+                     let spawnReserver = false;
                      if (reserverCount < RESERVERS_PER_FLAG) {
+                        spawnReserver = true;
+                     }
+                     else {
+                        //Check if we need to preemptively spawn a reserver, so that the reservation doesnt lapse before the new one can get there
+                        let expiringReservers = _.filter(Game.creeps, function(creep) {
+                           return (crepe.memory.role === Factory.ROLE_RESERVER) && (creep.memory.assignedRoom === room.name) && (creep.memory.targetFlag === key)
+                                 && (creep.ticksToLive < TICKS_TO_LAPSE);
+                        });
+
+                        if (expiringReservers.length > 0) {
+                           spawnReserver = true;
+                        }
+                     }
+
+                     if (spawnReserver) {
                         if (room.energyAvailable >= Factory.Creep.Reserver.cost) {
                            //Create deployed reserver
                            Factory.Creep.Reserver.spawn(spawn, key);
