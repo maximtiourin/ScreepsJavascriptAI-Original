@@ -46,6 +46,12 @@ var Utility = {
         undefinedBooleanFunction: function(func, value) {
             return (func != undefined && func != null) ? (func(value)) : (true);
         },
+        isCreepEnergyEmpty: function(creep) {
+            return creep.carry.energy == 0;
+        },
+        isCreepEnergyFull: function(creep) {
+            return creep.carry.energy == creep.carryCapacity;
+        },
         isCreepRole: function(creep, role) {
             return creep.memory.role === role;   
         },
@@ -83,7 +89,20 @@ var Utility = {
     },
     Filter: {
         Boolean: {
-
+            refuelStructures: function(structure) {
+                return (structure.energy < structure.energyCapacity);
+            },
+            repairStructures: function(structure) {
+                if (structure.structureType === STRUCTURE_RAMPART) {
+                    return structure.hits <= 60000;
+                }
+                else if (structure.structureType === STRUCTURE_WALL) {
+                    return structure.hits <= 60000;
+                }
+                else {
+                    return structure.hits < structure.hitsMax;
+                }
+            }
         },
         Priority: {
             buildStructures: function(e) {
@@ -106,6 +125,34 @@ var Utility = {
                 }
                 else {
                  return 999;
+                }
+            },
+            refuelStructures: function(e) {
+                if (e.structureType === STRUCTURE_SPAWN) {
+                    return 1;
+                }
+                else if (e.structureType === STRUCTURE_EXTENSION) {
+                    return 2;
+                }
+                else if (e.structureType === STRUCTURE_TOWER) {
+                    return 3;
+                }
+                else {
+                    return 999;
+                }
+            },
+            repairStructures: function(e) {
+                if (e.structureType === STRUCTURE_CONTAINER) {
+                    return 1;
+                }
+                else if (e.structureType === STRUCTURE_EXTENSION) {
+                    return 2;
+                }
+                else if (e.structureType === STRUCTURE_TOWER) {
+                    return 3;
+                }
+                else {
+                    return 999;
                 }
             }
         }

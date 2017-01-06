@@ -10,7 +10,7 @@ var AI = {
              * [Uses TickCaching]
              */
             myConstructionSites: function(room, creep) {
-              let sites = TickCache("List.allConstructionSitesInRoom.my" + room.name, function() {
+              let sites = TickCache.cache("List.allConstructionSitesInRoom.my::" + room.name, function() {
                 return Utility.List.allConstructionSitesInRoom(room, Utility.OWNERSHIP_MINE);
               });
 
@@ -159,6 +159,26 @@ var AI = {
                 else {
                   return false;
                 }
+              },
+              energyMyStructures: function(room, creep) {
+                let refuelStructures = TickCache.cache("List.allStructuresInRoom.myNeedRefueling::" + room.name, function() {
+                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.refuelStructures);
+                });
+
+                if (refuelStructures.length > 0) {
+                  let priorityGroup = Utility.Group.first(refuelStructures, Utility.Filter.Priority.refuelStructures);
+
+                  let sortedPriorityGroup = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
+
+                  let closestStructure = sortedPriorityGroup[0];
+
+                  AI.Creep.Behavior.Refuel.target(creep, closestStructure, RESOURCE_ENERGY);
+
+                  return true;
+                }
+                else {
+                  return false;
+                }
               }
             },
             /*
@@ -183,6 +203,32 @@ var AI = {
             }
          },
          Repair: {
+            Advanced: {
+              myStructures: function(room, creep) {
+                let structures = TickCache.cache("List.allStructuresInRoom.myNeedRepairing::" + room.name, function() {
+                  return Utility.List.allStructuresInRoom(room, Utility.OWNERSHIP_MINE, false, Utility.Filter.Boolean.repairStructures);
+                });
+
+                if (structures.length > 0) {
+                   //Get the group of structure structuresTypes that have priority
+                   let priorityGroup = Utility.Group.first(structures, Utility.Filter.Priority.repairStructures);
+
+                   //Sort that group for distanceSquared
+                   let sortedStructures = Utility.Sort.Position.distanceSquared(priorityGroup, creep);
+
+                   //Select our priority structure
+                   let priorityStructure = sortedStructures[0];
+
+                   //Attempt to repair priority structure
+                   AI.Creep.Behavior.Repair.target(creep, priorityStructure);
+
+                   return true;
+                }
+                else {
+                  return false;
+                }
+              }
+            },
             /*
              * Attempts to repair the target, moving to it if not in range
              */
